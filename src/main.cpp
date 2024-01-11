@@ -58,9 +58,7 @@ void setup() {
     });
 
     // To add persistent rotation or other effects to your displays, add a global effect:
-    #if DISPLAY_SET == 1
-    displayManager->addGlobalEffect(new Rotate180(ALL));
-    #endif
+    //displayManager->addGlobalEffect(new Rotate180(ALL));
 
     ledStrip = new LEDStrip(EEPROM.read(Config::EEPROM::LEDSTRIP));
 

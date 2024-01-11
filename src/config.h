@@ -36,18 +36,7 @@ namespace Config {
     }
 
     namespace Displays {
-        // 1 - breadboard boi, 0 - prod
-        #define DISPLAY_SET 1
         // Positions of LED matrixes, used as unique identifier
-        #if DISPLAY_SET == 1
-        const u8 
-        POS_EYE_L =     1,     // eye left
-        POS_EYE_R =     96,    // eye right
-        POS_MOUTH_L =   16,    // mouth left
-        POS_MOUTH_R =   48,    // mouth right
-        POS_NOSE_L =    8,     // nose left
-        POS_NOSE_R =    80;    // nose right
-        #else
         const u8 
         POS_EYE_L =     96,    // eye left
         POS_EYE_R =     0,     // eye right
@@ -55,7 +44,6 @@ namespace Config {
         POS_MOUTH_R =   16,    // mouth right
         POS_NOSE_L =    56,    // nose left
         POS_NOSE_R =    48;    // nose left
-        #endif
 
         // Display Bitmasks (identifier)
         // Leave these unless you want to remap displays

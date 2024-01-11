@@ -1,0 +1,62 @@
+#pragma once
+
+#include "Utilities/Typedefs.h"
+#include "Utilities/Util.h"
+#include "Utilities/Globals.h"
+#include <Arduino.h>
+#include <vector>
+#include "Particle.h"
+
+/**
+ * Particle system.
+ *
+ * Each buffer has its own ParticleSystem which can be controlled with effects:
+ * EmitParticles, ClearParticles, ParticleColumn, ...
+ */
+class ParticleSystem {
+  private:
+    size_t maxParticles;
+    bool updated = false;
+
+  public:
+    std::vector<Particle> particles;
+    /**
+     * Construct a ParticleSystem.
+     * @param maxParticle Maximum amount of particles.
+     */
+    ParticleSystem(size_t maxParticles);
+
+    /**
+     * Emit particles with given parameters.
+     * @param count Amount of particles to emit.
+     * @param maxX Maximum X position (width) for particles.
+     * @param x X position of the emitter.
+     * @param y Y position of the emitter.
+     * @param minXSpeed Minimum particle X speed.
+     * @param maxXSpeed Maxium particle X speed.
+     * @param minYSpeed Minimum particle Y speed.
+     * @param maxYSpeed Maxium particle Y speed.
+     */
+    void emit(
+        u8 count, u8 maxX, f32 x, f32 y, f32 minXSpeed, f32 minYSpeed, f32 maxXSpeed, f32 maxYSpeed,
+        DrawMode drawMode = DRAW_MODE_1
+    );
+
+    void emit(
+        u8 count, u8 maxX, f32 x, f32 y, f32 minXSpeed, f32 minYSpeed, f32 maxXSpeed, f32 maxYSpeed, f32 minXGravity,
+        f32 minYGravity, f32 maxXGravity, f32 maxYGravity, DrawMode drawMode = DRAW_MODE_1
+    );
+
+    /**
+     * Update loop.
+     * @return true if particles have been updated, false otherwise.
+     */
+    bool update();
+
+    /**
+     * Clear all particles in this ParticleSystem
+     */
+    void clear();
+
+    const std::vector<Particle>& getParticles();
+};

@@ -1,0 +1,8 @@
+.pio
+.vs
+.vscode
+test/README
+lib/README
+include/README
+protogen-cppcheck-build-dir
+protogen.cppcheck

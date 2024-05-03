@@ -21,7 +21,7 @@ class SnakeGameController : public Controller {
     u16 score, maxSnakeSize;
     u8 tailRemaining;
     SnakeGameState state;
-    Direction direction;
+    Direction direction, lastDirection;
 
     Timestamp blinkTime, blinkPeriod;
     Timestamp time, period;
@@ -80,12 +80,14 @@ class SnakeGameController : public Controller {
         }
         state = SNAKE_STOP;
         direction = NONE;
+        lastDirection = NONE;
     }
 
     void resetGame() {
         score = 0;
         state = SNAKE_WAITING;
         direction = NONE;
+        lastDirection = NONE;
         snakeParts.clear();
 
         for(Display* d : gameDisplays) {
@@ -175,6 +177,8 @@ class SnakeGameController : public Controller {
                 }
                     
                 displayManager->requestRedraw();
+
+                lastDirection = direction;
                 break;
         }
     }
@@ -210,10 +214,10 @@ class SnakeGameController : public Controller {
     }
 
     void handleInput(u8 x, u8 y) override {
-        if(y == 0x00 && direction != DOWN) direction = UP;
-        else if(x == 0xFF && direction != RIGHT) direction = LEFT;
-        else if(y == 0xFF && direction != UP) direction = DOWN;
-        else if(x == 0x00 && direction != LEFT) direction = RIGHT;
+        if(y == 0x00 && lastDirection != DOWN) direction = UP;
+        else if(x == 0xFF && lastDirection != RIGHT) direction = LEFT;
+        else if(y == 0xFF && lastDirection != UP) direction = DOWN;
+        else if(x == 0x00 && lastDirection != LEFT) direction = RIGHT;
     }
 
     void update() override {

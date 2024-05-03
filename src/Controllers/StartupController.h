@@ -25,7 +25,6 @@ class StartupController : public Controller {
         displayManager->hud->drawStr(x + 2, y + 26, "BLASTER");
         displayManager->hud->setDrawColor(1);
         displayManager->hud->drawStr(x + 2, y + 17, "Toaster");
-        //displayManager->hud->drawStr(x + 2, y + 7, "Adeon's");
         displayManager->hud->drawStrX2(x + 40, y + 28, Config::VERSION_NUMBER);
     }
 

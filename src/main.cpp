@@ -19,13 +19,9 @@ SequencePlayer* sequencePlayer;
 Controller* controller;
 TaskHandle_t asyncLoopTask;
 Timestamp lastTime;
-#ifdef ENABLE_ANIMATED_MOUTH
-AnimatedMouth* animatedMouth;
-#endif
-
 SettingsManager* settingsManager;
 HeadsUpDisplay* hud;
-TweenManager* tweenManager;
+TweenManager* displayTweenManager;
 AnalogBoopSensor* boopSensor;
 EyeBlink* eyeBlink;
 LEDStrip* ledStrip;
@@ -43,22 +39,22 @@ void setup() {
         new Max7219(Config::Pins::MATRIX_DIN, Config::Pins::MATRIX_CS, Config::Pins::MATRIX_CLK), hud, EEPROM.read(Config::EEPROM::MATRIX)
     );
 
-    tweenManager = new TweenManager(displayManager);
+    displayTweenManager = new TweenManager([](){displayManager->requestRedraw();});
 
     // Register displays (matrix position, number of rows (size), bitmask, hud preview position)
     // Simply comment out any displays that are not in use.
     using namespace Config::Displays;
     displayManager->addDisplays({
-        new Display(POS_EYE_L,    16,   EYE_L,    {49, 0},    tweenManager),
-        new Display(POS_EYE_R,    16,   EYE_R,    {1, 0},     tweenManager),
-        new Display(POS_MOUTH_L,  32,   MOUTH_L,  {34, 8},    tweenManager),
-        new Display(POS_MOUTH_R,  32,   MOUTH_R,  {0, 8},     tweenManager),
-        new Display(POS_NOSE_L,   8,    NOSE_L,   {35, 0},    tweenManager),
-        new Display(POS_NOSE_R,   8,    NOSE_R,   {23, 0},    tweenManager),
+        new Display(POS_EYE_L,    16,   EYE_L,    {49, 0},    displayTweenManager),
+        new Display(POS_EYE_R,    16,   EYE_R,    {1, 0},     displayTweenManager),
+        new Display(POS_MOUTH_L,  32,   MOUTH_L,  {34, 8},    displayTweenManager),
+        new Display(POS_MOUTH_R,  32,   MOUTH_R,  {0, 8},     displayTweenManager),
+        new Display(POS_NOSE_L,   8,    NOSE_L,   {35, 0},    displayTweenManager),
+        new Display(POS_NOSE_R,   8,    NOSE_R,   {23, 0},    displayTweenManager),
     });
 
     // To add persistent rotation or other effects to your displays, add a global effect:
-    //displayManager->addGlobalEffect(new Rotate180(ALL));
+    // displayManager->addGlobalEffect(new Rotate180(ALL));
 
     ledStrip = new LEDStrip(EEPROM.read(Config::EEPROM::LEDSTRIP));
 
@@ -77,7 +73,7 @@ void setup() {
         EEPROM.read(Config::EEPROM::AUTO_BLINK)
     );
 
-    sequencePlayer = new SequencePlayer(displayManager, tweenManager, ledStrip, eyeBlink, &Sequences::startup, EEPROM.read(Config::EEPROM::RARE_TRANSITION_CHANCE), true);
+    sequencePlayer = new SequencePlayer(displayManager, displayTweenManager, ledStrip, eyeBlink, &Sequences::startup, EEPROM.read(Config::EEPROM::RARE_TRANSITION_CHANCE), true);
     
     sequencePlayer->addCommonTransitions({
         &Transitions::blink,
@@ -95,10 +91,6 @@ void setup() {
         &Transitions::fizz,
         &Transitions::doomMelt,
     });
-
-    #ifdef ENABLE_ANIMATED_MOUTH
-    animatedMouth = new AnimatedMouth(displayManager, 33 MILLIS, 500, 500, EEPROM.read(Config::EEPROM::ANIMATED_MOUTH));
-    #endif
 
     /*
     boopSensor = new DigitalBoopSensor(
@@ -142,14 +134,11 @@ void loop(){
     #endif
     sequencePlayer->update();
     controller->update();
-    tweenManager->update();
+    displayTweenManager->update();
     boopSensor->update();
     eyeBlink->update();
     ledStrip->update();
     uptimeCounter->update();
-    #ifdef ENABLE_ANIMATED_MOUTH
-    animatedMouth->update();
-    #endif
     displayManager->update();
 }
 
@@ -230,9 +219,9 @@ void createSettingsMenu() {
 
     settingsManager->addSettings({
         new LambdaSetting(
-            "Matrix", "Brightness", 15, 
-            []() -> u8 { return displayManager->getMatrixBrightness(); },
-            [](i8 value) { displayManager->addMatrixBrightness(value); }, 
+            "Matrix", "Brightness", 15 / 3, 
+            []() -> u8 { return displayManager->getMatrixBrightness() / 3; },
+            [](i8 value) { displayManager->addMatrixBrightness(value * 3); }, 
             Config::EEPROM::MATRIX_BRIGHTNESS
         ),
 
@@ -257,30 +246,6 @@ void createSettingsMenu() {
             [](i8 value) { boopSensor->calibrate(); }
         ),
 
-        #ifdef ENABLE_ANIMATED_MOUTH
-        new ComponentToggleSetting("Mouth anim.", "Enable", animatedMouth, Config::EEPROM::ANIMATED_MOUTH),
-
-        new LambdaSetting(
-            "Mouth anim.", "Noise floor", 250,
-            []() -> u8 { return animatedMouth->getNoiseFloor(); }, 
-            [](i8 value) { animatedMouth->addNoiseFloor(value * 10); },
-            Config::EEPROM::ANIMATED_MOUTH_NOISE_FLOOR
-        ),
-
-        new LambdaSetting(
-            "Mouth anim.", "Peak minimum", 250,
-            []() -> u8 { return animatedMouth->getPeakMinimum(); }, 
-            [](i8 value) { animatedMouth->addPeakMinimum(value * 10); },
-            Config::EEPROM::ANIMATED_MOUTH_PEAK_MIN
-        ),
-
-        new LambdaSetting(
-            "Mouth anim.", "Calibrate mic.", 0,
-            []() -> u8 { return 0; }, 
-            [](i8 value) { animatedMouth->reset(); }
-        ),
-        #endif
-
         new LambdaSetting(
             "Transitions", "Rare chance %", 100,
             []() -> u8 { return sequencePlayer->getRareTransitionChance(); }, 
@@ -289,9 +254,9 @@ void createSettingsMenu() {
         ),
 
         new LambdaSetting(
-            "Fan control", "Speed", 255,
-            []() -> u8 { return fanControl->getSpeed(); }, 
-            [](i8 value) { fanControl->addSpeed(value * 10); },
+            "Fan control", "Speed", 255 / 51,
+            []() -> u8 { return fanControl->getSpeed() / 51; }, 
+            [](i8 value) { fanControl->addSpeed(value * 51); },
             Config::EEPROM::FAN_PWM_SPEED
         ),
 
@@ -299,9 +264,6 @@ void createSettingsMenu() {
             "Fun", "Snake Game", 0,
             []() -> u8 { return 0; }, 
             [](i8 value) { 
-                #ifdef ENABLE_ANIMATED_MOUTH
-                animatedMouth->stop(); 
-                #endif
                 changeController(new SnakeGameController(displayManager, MOUTH, EYES, 200 MILLIS)); 
             }
         ),
@@ -310,9 +272,6 @@ void createSettingsMenu() {
             "Fun", "Analyzer", 0,
             []() -> u8 { return 0; }, 
             [](i8 value) { 
-                #ifdef ENABLE_ANIMATED_MOUTH
-                animatedMouth->stop(); 
-                #endif
                 changeController(new SpectrumAnalyzerController(displayManager)); 
             }
         ),

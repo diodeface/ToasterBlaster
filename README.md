@@ -125,5 +125,10 @@ In "KEY" mode, both joystick and ABXY buttons trigger controller actions.
 # (todo) Contributing
 <br><br>
 
+# Credits
+- [olikraus/u8g2](https://github.com/olikraus/u8g2)
+- [FastLED/FastLED](https://github.com/FastLED/FastLED)
+- [kosme/arduinoFFT](https://github.com/kosme/arduinoFFT)
+
 # License
 This program is licensed under [GNU Affero General Public License v3.0](LICENSE).

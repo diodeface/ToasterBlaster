@@ -1,8 +1,7 @@
 #include "TweenManager.h"
-#include "Drawing/DisplayManager.h"
 
-TweenManager::TweenManager(DisplayManager* displayManager, u8 initialLimit)
-    : displayManager(displayManager) {
+TweenManager::TweenManager(std::function<void()> postUpdateFunction, u8 initialLimit)
+    : postUpdateFunction(postUpdateFunction) {
     tweens.reserve(initialLimit);
 }
 
@@ -38,5 +37,5 @@ void TweenManager::update() {
         }
     }
 
-    displayManager->requestRedraw();
+    postUpdateFunction();
 }

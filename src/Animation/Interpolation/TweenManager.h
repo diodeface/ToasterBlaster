@@ -3,13 +3,12 @@
 // todo: documentation
 
 #include <vector>
+#include <functional>
 
 #include "Utilities/Typedefs.h"
 #include "Components/ToasterComponent.h"
 #include "Tweenable.h"
 #include "TweenFunction.h"
-
-class DisplayManager;
 
 /**
  * Tween manager
@@ -17,11 +16,11 @@ class DisplayManager;
  */
 class TweenManager : public ToasterComponent {
   private:
-    DisplayManager* displayManager;
+    std::function<void()> postUpdateFunction;
     std::vector<ITweenable*> tweens;
 
   public:
-    TweenManager(DisplayManager* displayManager, u8 initialLimit = 24);
+    TweenManager(std::function<void()> postUpdateFunction, u8 initialLimit = 24);
 
     void add(ITweenable* t);
 

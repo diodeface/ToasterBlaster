@@ -73,8 +73,8 @@ class SettingsController : public Controller {
         if(settingsCursorOutOfBounds()) {
             return;
         }
-        drawSetting();
         settingsManager->getSettings()[settingCursor]->add(value);
+        drawSetting();
     }
 
     void drawSetting() {

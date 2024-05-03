@@ -10,8 +10,6 @@
 
 // Include bluetooth gamepad support 
 #define BT_CONTROLLER
-// Include mouth animation (experimental)
-//#define ENABLE_ANIMATED_MOUTH
 
 namespace Config {
     // Pin numbers for components
@@ -36,7 +34,6 @@ namespace Config {
     }
 
     namespace Displays {
-        // Positions of LED matrixes, used as unique identifier
         const u8 
         POS_EYE_L =     96,    // eye left
         POS_EYE_R =     0,     // eye right
@@ -107,5 +104,5 @@ namespace Config {
     const i32 DEFAULT_PARTICLE_LIFESPAN = 3 SECONDS;
 
     const u8 DISPLAY_HEIGHT = 8;        // do NOT touch this >:(
-    static const char* VERSION_NUMBER = "v0.3";
+    static const char* VERSION_NUMBER = "v0.3.1";
 }

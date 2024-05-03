@@ -41,8 +41,7 @@ class U8G2HUDWrapper : public HeadsUpDisplay {
     U8G2HUDWrapper(u8 scl, u8 sda) {
         u8g2 = new U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, U8X8_PIN_NONE, scl, sda);
         u8g2->begin();
-        u8g2->firstPage();
-        u8g2->clear();
+        u8g2->clearBuffer();
         u8g2->setFontMode(0);
         u8g2->setFont(u8g2_font_5x7_mr);     // todo: hardcoded font?
     }
@@ -114,6 +113,6 @@ class U8G2HUDWrapper : public HeadsUpDisplay {
     }
 
     void update() override {
-        u8g2->nextPage();
+        u8g2->sendBuffer();
     }
 };

@@ -164,6 +164,7 @@ void handleJoystickInput(u8 x, u8 y) {
     controller->handleInput(x, y);
 }
 
+#ifdef BT_CONTROLLER
 void createButtonMapping() {
     BLEGamepad::inputHandler.mapButtonsToJoystick(BTN_UP, BTN_DOWN, BTN_LEFT, BTN_RIGHT, handleJoystickInput);
     BLEGamepad::inputHandler.mapButtonsToJoystick(BTN_ALT_UP, BTN_ALT_DOWN, BTN_ALT_LEFT, BTN_ALT_RIGHT, handleJoystickInput);
@@ -213,14 +214,15 @@ void createButtonMapping() {
         }},
     });
 }
+#endif
 
 void createSettingsMenu() {
     settingsManager = new SettingsManager();
 
     settingsManager->addSettings({
         new LambdaSetting(
-            "Matrix", "Brightness", 15 / 3, 
-            []() -> u8 { return displayManager->getMatrixBrightness() / 3; },
+            "Matrix", "Brightness", 15, 
+            []() -> u8 { return displayManager->getMatrixBrightness(); },
             [](i8 value) { displayManager->addMatrixBrightness(value * 3); }, 
             Config::EEPROM::MATRIX_BRIGHTNESS
         ),
@@ -254,8 +256,8 @@ void createSettingsMenu() {
         ),
 
         new LambdaSetting(
-            "Fan control", "Speed", 255 / 51,
-            []() -> u8 { return fanControl->getSpeed() / 51; }, 
+            "Fan control", "Speed", 255,
+            []() -> u8 { return fanControl->getSpeed(); }, 
             [](i8 value) { fanControl->addSpeed(value * 51); },
             Config::EEPROM::FAN_PWM_SPEED
         ),

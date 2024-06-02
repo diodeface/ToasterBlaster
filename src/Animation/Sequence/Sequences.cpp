@@ -20,7 +20,7 @@ namespace Sequences {
     Translate* translateAll = new Translate(ALL, 0, 0);
 
     Glitch* smallGlitch = new Glitch(ALL, 5, 3);
-    ParticleEdge* pulseEyes = new ParticleEdge(EYES, 1, 0, 1.9f, 0, 2.0f, 0);
+    ParticleEdge* pulseEyes = new ParticleEdge(EYES, 1, 0, 90, 0, 90, 0);
     
     // Simple faces ---------------------------
     Sequence neutral {
@@ -105,7 +105,7 @@ namespace Sequences {
                 new Tween<u8>(&(winkRight->amount), 0, 4, 250 MILLIS, TWEEN_IN),
                }, { {MOUTH, Mouth::smile}}, 0 MILLIS },
             { {mirrorLeft, translateAll, translateEyeRight, winkRight}, {}, 150 MILLIS },
-            { {mirrorLeft, translateAll, translateEyeRight, winkRight, new EmitParticles(EYE_R, 5, 4, 4, -0.2, -1.0, -0.8, 1.0),}, {}, 350 MILLIS },
+            { {mirrorLeft, translateAll, translateEyeRight, winkRight, new EmitParticles(EYE_R, 5, 4, 4, -40, -20, -10, 20),}, {}, 350 MILLIS },
             { {
                 mirrorLeft, translateAll, translateEyeRight, winkRight, 
                 new Tween<i8>(&(translateAll->y), 1, 0, 250 MILLIS, TWEEN_IN_OUT), 

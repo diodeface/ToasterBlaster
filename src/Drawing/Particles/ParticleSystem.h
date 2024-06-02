@@ -1,5 +1,6 @@
 #pragma once
 
+#include "config.h"
 #include "Utilities/Typedefs.h"
 #include "Utilities/Util.h"
 #include "Utilities/Globals.h"
@@ -45,6 +46,27 @@ class ParticleSystem {
     void emit(
         u8 count, u8 maxX, f32 x, f32 y, f32 minXSpeed, f32 minYSpeed, f32 maxXSpeed, f32 maxYSpeed, f32 minXGravity,
         f32 minYGravity, f32 maxXGravity, f32 maxYGravity, DrawMode drawMode = DRAW_MODE_1
+    );
+
+    /**
+     * Emit particles with given parameters.
+     * @param count Amount of particles to emit.
+     * @param maxX Maximum X position (width) for particles.
+     * @param x X position of the emitter.
+     * @param y Y position of the emitter.
+     * @param minXSpeed Minimum particle X speed.
+     * @param maxXSpeed Maxium particle X speed.
+     * @param minYSpeed Minimum particle Y speed.
+     * @param maxYSpeed Maxium particle Y speed.
+     */
+    void emit(
+        u8 count, u8 maxX, q8_8 x, q8_8 y, q8_8 minXSpeed, q8_8 minYSpeed, q8_8 maxXSpeed, q8_8 maxYSpeed,
+        DrawMode drawMode = DRAW_MODE_1
+    );
+
+    void emit(
+        u8 count, u8 maxX, q8_8 x, q8_8 y, q8_8 minXSpeed, q8_8 minYSpeed, q8_8 maxXSpeed, q8_8 maxYSpeed, q8_8 minXGravity,
+        q8_8 minYGravity, q8_8 maxXGravity, q8_8 maxYGravity, DrawMode drawMode = DRAW_MODE_1
     );
 
     /**

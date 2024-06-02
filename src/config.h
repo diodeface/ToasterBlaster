@@ -8,8 +8,9 @@
  * Configuration constants for used for setup.
  */
 
-// Include bluetooth gamepad support 
-#define BT_CONTROLLER
+// Bluetooth Gamepad selection
+#define GAMEPAD_MOCUTE052F_NIMBLE
+//#define GAMEPAD_MOCUTE052F_BLUEDROID
 
 namespace Config {
     // Pin numbers for components
@@ -104,5 +105,4 @@ namespace Config {
     const i32 DEFAULT_PARTICLE_LIFESPAN = 3 SECONDS;
 
     const u8 DISPLAY_HEIGHT = 8;        // do NOT touch this >:(
-    static const char* VERSION_NUMBER = "v0.3.1";
 }

@@ -1,4 +1,6 @@
-#include "BLEGamepad.h"
+#include "config.h"
+#include "Gamepad.h"
+#ifdef GAMEPAD_MOCUTE052F_BLUEDROID
 
 // keycodes for "GAME" mode
 #define GAME_UP 0x1A
@@ -41,18 +43,16 @@ u8 previousData[18];
 u8 previousKey = 0;
 
 /**
- * Gamepad driver for MOCUTE 052F Gamepad
- * 
- * todo: Gamepad interface
+ * Legacy gamepad driver for MOCUTE 052F Gamepad
  */
-namespace BLEGamepad {
+
+namespace Gamepad {
     enum BTState {
         BTSTATE_DEFAULT,
         BTSTATE_SCANNING,
         BTSTATE_FINISHED
     };
 
-    InputHandler inputHandler;
     Timestamp indicatorTime;
     BTState state;
 
@@ -80,8 +80,6 @@ namespace BLEGamepad {
             }
             if (indicatorTime > period * 2) indicatorTime = 0;
         }
-
-        inputHandler.update();
     }
 
     ButtonInput translateKeycode(u8 keycode) {
@@ -199,7 +197,7 @@ namespace BLEGamepad {
     }
 
     void onStartScan(u8 retryCount) {
-        sprintf(btStatus, "Scanning (%d)", retryCount);
+        sprintf(btStatus, "Scan (%d)", retryCount);
         BT_LOG("Scanning for BT Gamepad (Attempt %d)\n", retryCount);
         state = BTSTATE_SCANNING;
     }
@@ -228,3 +226,4 @@ namespace BLEGamepad {
         BT_LOG("Bluetooth controller battery level changed (%d)\n", level);
     }
 }
+#endif

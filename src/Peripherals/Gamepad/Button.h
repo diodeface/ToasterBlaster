@@ -30,5 +30,5 @@ enum Button {
     BTN_ALT_TRIG2
 };
 
-#define BTN_STATE_PRESSED 255
-#define BTN_STATE_RELEASED 0
+static const u8 BTN_STATE_PRESSED = 255;
+static const u8 BTN_STATE_RELEASED = 0;

@@ -3,7 +3,7 @@
 #include "Utilities/Typedefs.h"
 #include "Utilities/Util.h"
 #include <Arduino.h>
-#include "Utilities/Util.h"
+#include "Utilities/q8_8.h"
 
 /**
  * Particle object.
@@ -18,7 +18,7 @@
  * @param type Particle type, specifies how the particle is drawn.
  */
 struct Particle {
-    f32 x, y, xSpeed, ySpeed, xGravity, yGravity;
+    q8_8 x, y, xSpeed, ySpeed, xGravity, yGravity;
     i32 lifespan;
     u8 maxX;
     DrawMode drawMode;

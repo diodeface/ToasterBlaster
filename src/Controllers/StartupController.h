@@ -25,7 +25,6 @@ class StartupController : public Controller {
         displayManager->hud->drawStr(x + 2, y + 26, "BLASTER");
         displayManager->hud->setDrawColor(1);
         displayManager->hud->drawStr(x + 2, y + 17, "Toaster");
-        displayManager->hud->drawStrX2(x + 40, y + 28, Config::VERSION_NUMBER);
     }
 
   public:
@@ -35,9 +34,9 @@ class StartupController : public Controller {
         , finishFunction(finishFunction)
         , time(0)
         , period(period) {
-        drawLogo(24, 10);
-        displayManager->hud->drawCenteredText(0, 48, 26, "github.com/4deon/");
-        displayManager->hud->drawCenteredText(0, 56, 26, "ToasterBlaster");
+        drawLogo(45, 10);
+        displayManager->hud->drawCenteredText(0, 48, 26, LINK_1);
+        displayManager->hud->drawCenteredText(0, 56, 26, LINK_2);
         displayManager->hud->drawFrame(0, 58, 128, 6);
     }
 

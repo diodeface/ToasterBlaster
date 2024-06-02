@@ -1,3 +1,5 @@
+#include "config.h"
+#ifdef GAMEPAD_MOCUTE052F_BLUEDROID
 #pragma once
 /* This example code is in the Public Domain (or CC0 licensed, at your option.)
    Unless required by applicable law or agreed to in writing, this software is
@@ -29,7 +31,7 @@
 #include "esp_hid_gap.h"
 
 #include "Utilities/Typedefs.h"
-#include "../BLEGamepad.h"
+#include "../Gamepad.h"
 
 #define SCAN_DURATION_SECONDS 5
 
@@ -40,3 +42,4 @@ namespace BLEGamepadExample {
     void deinit();
     void init(void);
 }
+#endif

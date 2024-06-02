@@ -76,7 +76,7 @@ class SnakeGameController : public Controller {
         Point part = snakeParts[1];
         for(Display* d : gameDisplays) {
             //Invert::invert(d->bitmapBuffer, d->getSize());
-            d->particleSystem->emit(32, d->getSize(), part.x, part.y, -0.5f, -0.5f, 0.5f, 0.5f, DRAW_MODE_XOR);
+            d->particleSystem->emit(100, d->getSize(), part.x, part.y, -50, -50, 50, 50, DRAW_MODE_XOR);
         }
         state = SNAKE_STOP;
         direction = NONE;

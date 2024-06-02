@@ -21,7 +21,6 @@
 
 #include "Animation/EyeBlink.h"
 
-#include "Peripherals/Microphone/AnimatedMouth.h"
 #include "Animation/Overlay/OverlayPlayer.h"
 #include "Peripherals/Sensors/AnalogBoopSensor.h"
 
@@ -29,21 +28,32 @@
 
 #include "Components/UptimeCounter.h"
 
+#include "Peripherals/Gamepad/InputHandler.h"
+
 extern SettingsManager* settingsManager;
 extern SequencePlayer* sequencePlayer;
 extern DisplayManager* displayManager;
 extern EyeBlink* eyeBlink;
-
-#ifdef BT_CONTROLLER
-#include "Peripherals/BLEGamepad/BLEGamepad.h"
-#endif
-
-#include "Peripherals/PWMFan.h"
-
-#include "Settings/SettingsManager.h"
+extern InputHandler inputHandler;
 
 void changeController(Controller* newController);
 void loopAsync(void* pvParameters);
-void handleControllerInput(u8 x, u8 y);
+void handleJoystickInput(u8 x, u8 y);
 void createSettingsMenu();
 void createButtonMapping();
+void safeMode();
+
+#include "Peripherals/PWMFan.h"
+#include "Settings/SettingsManager.h"
+
+#include "Peripherals/Gamepad/ButtonDebounce.h"
+
+#ifdef GAMEPAD_MOCUTE052F_NIMBLE
+#include "Peripherals/Gamepad/Mocute052f_NimBLE/Gamepad.h"
+#define BT_GAMEPAD
+#endif
+
+#ifdef GAMEPAD_MOCUTE052F_BLUEDROID
+#include "Peripherals/Gamepad/Mocute052f_Bluedroid/Gamepad.h"
+#define BT_GAMEPAD
+#endif

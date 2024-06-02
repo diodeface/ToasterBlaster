@@ -20,8 +20,6 @@ void InputHandler::mapButtons(std::initializer_list<ButtonMapping> buttonMapping
 }
 
 void InputHandler::mapButtonsToJoystick(Button up, Button down, Button left, Button right, std::function<void(u8, u8)> callback) {
-    // sigh
-    // todo: this is a leftover from the old joystick code, consider rewriting how controllers handle joystick inputs?
     mapButton({up, BTN_STATE_PRESSED, [callback]() {callback(0x80, 0x00);}});
     mapButton({down, BTN_STATE_PRESSED, [callback]() {callback(0x80, 0xff);}});
     mapButton({left, BTN_STATE_PRESSED, [callback]() {callback(0xff, 0x80);}});

@@ -6,6 +6,7 @@
 #include "Utilities/Util.h"
 #include "Drawing/Particles/ParticleSystem.h"
 #include "Animation/Interpolation/TweenManager.h"
+#include "fpm/math.hpp"
 
 class Effect;
 class Overlay;
@@ -23,7 +24,7 @@ class Display {
 
   public:
     ParticleSystem* particleSystem;
-    TweenManager* tweenManager;     // global TweenManager instance, used when applying effects (todo: this is hacky as hell, use singleton pattern or something idk)
+    TweenManager* tweenManager;     // TweenManager instance for displays, used when applying effects
     Point hudPreviewPosition;       // x, y offset on the HUD preview
 
     // buffers

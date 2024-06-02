@@ -5,6 +5,7 @@
  */
 
 #include "Utilities/Typedefs.h"
+#include "q8_8.h"
 #include "Arduino.h"
 
 #ifdef DEBUG

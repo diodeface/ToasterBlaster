@@ -6,6 +6,7 @@
 
 #include "Utilities/Typedefs.h"
 #include "OverlaySequence.h"
+#include "Drawing/Particles/ParticleSystem.h"
 
 namespace Transitions {
     extern Transition 

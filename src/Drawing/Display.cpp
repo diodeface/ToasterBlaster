@@ -29,7 +29,7 @@ Display::~Display() {
 
 void Display::renderParticles() {
     for(Particle p : particleSystem->getParticles()) {
-        SetPixel::setPixel(hudBuffer, size, nearbyint(p.x), nearbyint(p.y), p.drawMode);
+        SetPixel::setPixel(hudBuffer, size, (u8)fpm::nearbyint(p.x), (u8)fpm::nearbyint(p.y), p.drawMode);
     }
 }
 

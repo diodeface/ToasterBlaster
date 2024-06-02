@@ -41,8 +41,7 @@ OverlaySequence* SequencePlayer::getRandomTransition() {
 
 SequencePlayer::SequencePlayer(
     DisplayManager* displayManager, 
-    TweenManager* tweenManager, 
-    LEDStrip* ledStrip, 
+    TweenManager* tweenManager,
     EyeBlink* eyeBlink,
     Sequence* sequence, 
     u8 rareTransitionChance, 
@@ -50,7 +49,6 @@ SequencePlayer::SequencePlayer(
 )
     : displayManager(displayManager)
     , tweenManager(tweenManager)
-    , ledStrip(ledStrip) 
     , eyeBlink(eyeBlink)
 {
     this->enabled = enabled;
@@ -135,7 +133,6 @@ bool SequencePlayer::transitionSequence(Sequence* sequence) {
     }
 
     nextSequence = sequence;
-    ledStrip->speed = 30;
     displayManager->hud->drawStatusText(sequence->name);
     return true;
 }
@@ -203,7 +200,7 @@ u8 SequencePlayer::getRareTransitionChance() {
 void SequencePlayer::setRareTransitionChance(u8 chance) {
     if (chance > 100) rareTransitionChance = 100;
     else rareTransitionChance = chance;
-    TOASTER_LOG("Set rare transition chance to %ď\n", rareTransitionChance);
+    TOASTER_LOG("Set rare transition chance to %d\n", rareTransitionChance);
 }
 
 void SequencePlayer::addRareTransitionChance(i8 value) {

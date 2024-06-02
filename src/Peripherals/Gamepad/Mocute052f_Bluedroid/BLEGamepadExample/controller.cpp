@@ -1,3 +1,5 @@
+#include "config.h"
+#ifdef GAMEPAD_MOCUTE052F_BLUEDROID
 /* This example code is in the Public Domain (or CC0 licensed, at your option.)
    Unless required by applicable law or agreed to in writing, this software is
    distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
@@ -5,7 +7,6 @@
  */
 
 #include "controller.h"
-#include "config.h"
 
 namespace BLEGamepadExample {
     esp_hidh_config_t config = {
@@ -26,7 +27,7 @@ namespace BLEGamepadExample {
                 const u8 *bda = esp_hidh_dev_bda_get(param->open.dev);
                 ESP_LOGI(TAG, ESP_BD_ADDR_STR " OPEN: %s", ESP_BD_ADDR_HEX(bda), esp_hidh_dev_name_get(param->open.dev));
                 esp_hidh_dev_dump(param->open.dev, stdout);
-                BLEGamepad::onBluetoothConnect(esp_hidh_dev_name_get(param->open.dev));
+                Gamepad::onBluetoothConnect(esp_hidh_dev_name_get(param->open.dev));
             } else {
                 ESP_LOGE(TAG, " OPEN failed!");
             }
@@ -35,14 +36,14 @@ namespace BLEGamepadExample {
         case ESP_HIDH_BATTERY_EVENT: {
             const u8 *bda = esp_hidh_dev_bda_get(param->battery.dev);
             ESP_LOGI(TAG, ESP_BD_ADDR_STR " BATTERY: %d%%", ESP_BD_ADDR_HEX(bda), param->battery.level);
-            BLEGamepad::onBluetoothBatteryEvent(param->battery.level);
+            Gamepad::onBluetoothBatteryEvent(param->battery.level);
             break;
         }
         case ESP_HIDH_INPUT_EVENT: {
             const u8 *bda = esp_hidh_dev_bda_get(param->input.dev);
             ESP_LOGI(TAG, ESP_BD_ADDR_STR " INPUT: %8s, MAP: %2u, ID: %3u, Len: %d, Data:", ESP_BD_ADDR_HEX(bda), esp_hid_usage_str(param->input.usage), param->input.map_index, param->input.report_id, param->input.length);
             ESP_LOG_BUFFER_HEX(TAG, param->input.data, param->input.length);
-            BLEGamepad::onBluetoothInput(param);
+            Gamepad::onBluetoothInput(param);
             break;
         }
         case ESP_HIDH_FEATURE_EVENT: {
@@ -56,7 +57,7 @@ namespace BLEGamepadExample {
         case ESP_HIDH_CLOSE_EVENT: {
             const u8 *bda = esp_hidh_dev_bda_get(param->close.dev);
             ESP_LOGI(TAG, ESP_BD_ADDR_STR " CLOSE: %s", ESP_BD_ADDR_HEX(bda), esp_hidh_dev_name_get(param->close.dev));
-            BLEGamepad::onBluetoothDisconnect();
+            Gamepad::onBluetoothDisconnect();
             break;
         }
         default:
@@ -69,12 +70,12 @@ namespace BLEGamepadExample {
         size_t results_len = 0;
         u8 retry_count = 0;
         while (!connected_device) {
-            BLEGamepad::onStartScan(retry_count);
+            Gamepad::onStartScan(retry_count);
             esp_hid_scan_result_t *results = NULL;
             ESP_LOGI(TAG, "SCAN...");
             esp_hid_scan(SCAN_DURATION_SECONDS, &results_len, &results);
             ESP_LOGI(TAG, "SCAN: %u results", results_len);
-            BLEGamepad::onStopScan(retry_count++);
+            Gamepad::onStopScan(retry_count++);
             if (results_len) {
                 esp_hid_scan_result_t *r = results;
                 esp_hid_scan_result_t *cr = NULL;
@@ -155,3 +156,4 @@ namespace BLEGamepadExample {
         create_hid_demo_task();
     }
 }
+#endif

@@ -27,24 +27,14 @@ ParticleSystem::ParticleSystem(size_t maxParticles) {
  * @param maxYSpeed Maxium particle Y gravity.
  */
 void ParticleSystem::emit(
-    u8 count, u8 maxX, f32 x, f32 y, f32 minXSpeed, f32 minYSpeed, f32 maxXSpeed, f32 maxYSpeed, f32 minXGravity,
-    f32 minYGravity, f32 maxXGravity, f32 maxYGravity, DrawMode drawMode
+    u8 count, u8 maxX, q8_8 x, q8_8 y, q8_8 minXSpeed, q8_8 minYSpeed, q8_8 maxXSpeed, q8_8 maxYSpeed, q8_8 minXGravity,
+    q8_8 minYGravity, q8_8 maxXGravity, q8_8 maxYGravity, DrawMode drawMode
 ) {
-    minXSpeed *= 100.0f;
-    minYSpeed *= 100.0f;
-    maxXSpeed *= 100.0f;
-    maxYSpeed *= 100.0f;
-
-    minXGravity *= 100.0f;
-    minYGravity *= 100.0f;
-    maxXGravity *= 100.0f;
-    maxYGravity *= 100.0f;
-
     for(size_t i = 0; i < count; i++) {
         if(particles.size() >= maxParticles) return;
         particles.push_back(
-            {x, y, random(minXSpeed, maxXSpeed) / 100.0f, random(minYSpeed, maxYSpeed) / 100.0f,
-             random(minXGravity, maxXGravity) / 100.0f, random(minYGravity, maxYGravity) / 100.0f, 
+            {x, y, random(minXSpeed, maxXSpeed), random(minYSpeed, maxYSpeed),
+             random(minXGravity, maxXGravity), random(minYGravity, maxYGravity), 
              Config::DEFAULT_PARTICLE_LIFESPAN, maxX, drawMode}
         );
     }
@@ -57,14 +47,31 @@ void ParticleSystem::emit(
  * @param x X position of the emitter.
  * @param y Y position of the emitter.
  * @param minXSpeed Minimum particle X speed.
- * @param maxXSpeed Maxium particle X speed.
  * @param minYSpeed Minimum particle Y speed.
+ * @param maxXSpeed Maxium particle X speed.
  * @param maxYSpeed Maxium particle Y speed.
  */
 void ParticleSystem::emit(
+    u8 count, u8 maxX, q8_8 x, q8_8 y, q8_8 minXSpeed, q8_8 minYSpeed, q8_8 maxXSpeed, q8_8 maxYSpeed, DrawMode drawMode
+) {
+    emit(count, maxX, x, y, minXSpeed, minYSpeed, maxXSpeed, maxYSpeed, q8_8(0), q8_8(0), q8_8(0), q8_8(0), drawMode);
+}
+
+void ParticleSystem::emit(
     u8 count, u8 maxX, f32 x, f32 y, f32 minXSpeed, f32 minYSpeed, f32 maxXSpeed, f32 maxYSpeed, DrawMode drawMode
 ) {
-    emit(count, maxX, x, y, minXSpeed, minYSpeed, maxXSpeed, maxYSpeed, 0, 0, 0, 0, drawMode);
+    emit(count, maxX, q8_8(x), q8_8(y), q8_8(minXSpeed), q8_8(minYSpeed), q8_8(maxXSpeed), q8_8(maxYSpeed), drawMode);
+}
+
+void ParticleSystem::emit(
+    u8 count, u8 maxX, f32 x, f32 y, f32 minXSpeed, f32 minYSpeed, f32 maxXSpeed, f32 maxYSpeed, f32 minXGravity,
+    f32 minYGravity, f32 maxXGravity, f32 maxYGravity, DrawMode drawMode
+) {
+    emit(
+        count, maxX, 
+        q8_8(x), q8_8(y), q8_8(minXSpeed), q8_8(minYSpeed), q8_8(maxXSpeed), q8_8(maxYSpeed),
+        q8_8(minXGravity), q8_8(minYGravity), q8_8(maxXGravity), q8_8(maxYGravity), drawMode
+    );
 }
 
 /**
@@ -76,15 +83,15 @@ bool ParticleSystem::update() {
         return false;
     }
 
-    f32 delta = deltaTime / 20000.0f;
+    q8_8 delta = q8_8(deltaTime * 0.000001);
 
     for(i32 i = particles.size() - 1; i >= 0; i--) {
         particles[i].xSpeed += particles[i].xGravity * delta;
         particles[i].ySpeed += particles[i].yGravity * delta;
         particles[i].x += particles[i].xSpeed * delta;
         particles[i].y += particles[i].ySpeed * delta;
-        if(particles[i].lifespan <= 0 || particles[i].y >= 8 || particles[i].y < 0 ||
-           particles[i].x >= particles[i].maxX || particles[i].x < 0) {
+        if(particles[i].lifespan <= 0 || particles[i].y >= q8_8(8) || particles[i].y < q8_8(0) ||
+           particles[i].x >= q8_8(particles[i].maxX) || particles[i].x < q8_8(0)) {
             particles.erase(particles.begin() + i);
             continue;
         }

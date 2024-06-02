@@ -28,7 +28,7 @@ namespace Transitions {
         for (u8 x = 0; x < size; x++) {
             for (u8 y = 0; y < Config::DISPLAY_HEIGHT; y++) {
                 display->particleSystem->particles.push_back(
-                    {(f32)x, (f32)y, 0, 0, 0, 0, (i32)random(150 MILLIS), size, getPixel(buffer, size, x, y)}
+                    {q8_8(x), q8_8(y), q8_8(0), q8_8(0), q8_8(0), q8_8(0), (i32)random(150 MILLIS), size, getPixel(buffer, size, x, y)}
                 );
             }
         }
@@ -66,7 +66,7 @@ namespace Transitions {
     Transition pulse {
         {
             SKIP_FRAME, // skip frame so that particle edge can catch up with the new bitmap
-            {{new ParticleEdge(ALL, 1, 0, 1.9f, 0, 2.0f, 0)}, 0},
+            {{new ParticleEdge(ALL, 1, 0, 50, 0, 50, 0)}, 0},
             END_SEQUENCE
         }
     };
@@ -159,13 +159,13 @@ namespace Transitions {
                 for (u8 x = 0; x < size; x++) {
                     for (u8 y = 0; y < Config::DISPLAY_HEIGHT; y++) {
                         display->particleSystem->emit(
-                            1, size, (f32)x, (f32)y,
+                            1, size, x, y,
 
-                            -0.4f, -1.0f,
-                            0.4f, 0.0f,
+                            -50, -20,
+                            50, 0,
 
-                            0.0f, 0.01f,
-                            0.0f, 0.01f,
+                            0, 60,
+                            0, 60,
 
                             getPixel(buffer, size, x, y)
                         );
@@ -184,16 +184,16 @@ namespace Transitions {
             {{new LambdaEffect(ALL, [](u8* buffer, Display* display) {
                 u8 size = display->getSize();
                 for (u8 x = 0; x < size; x++) {
-                    f32 meltSpeed = 0.01 * (f32)random(1, 5);
+                    q8_8 meltSpeed = random(q8_8(20), q8_8(100));
                     for (u8 y = 0; y < Config::DISPLAY_HEIGHT; y++) {
                         display->particleSystem->emit(
-                            1, size, (f32)x, (f32)y,
+                            1, size, q8_8(x), q8_8(y),
 
-                            0, 0,
-                            0, 0,
+                            q8_8(0), q8_8(0),
+                            q8_8(0), q8_8(0),
 
-                            0.0f, meltSpeed,
-                            0.0f, meltSpeed,
+                            q8_8(0), meltSpeed,
+                            q8_8(0), meltSpeed,
 
                             getPixel(buffer, size, x, y)
                         );
@@ -252,7 +252,7 @@ namespace Transitions {
             u8 size = display->getSize();
             for (u8 i = 0; i < size; i++) {
                 if (random(20) > 0) continue;
-                display->particleSystem->emit(1, size, i, 7, -0.1f, -0.5f, 0.1f, -2.0f);
+                display->particleSystem->emit(1, size, i, 7, -10, -80, 10, -40);
             }
         });
     }

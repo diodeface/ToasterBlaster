@@ -13,7 +13,7 @@
 
 enum ControllerType {
     CONTROLLER_DEFAULT,
-    CONTROLLER_STATUS,
+    CONTROLLER_SETTINGS,
     CONTROLLER_SLIT_EYE,
     CONTROLLER_FACE_SWITCHER,
     CONTROLLER_AUTOMATIC_FACE_SWITCHER,
@@ -47,6 +47,9 @@ class Controller : public ToasterComponent {
     }
 
     virtual void handleInput(u8 x, u8 y) {
+    }
+
+    virtual void handleRawInput(u8 x, u8 y) {
     }
     
     ControllerType getType() {

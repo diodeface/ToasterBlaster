@@ -5,7 +5,7 @@ class ToasterComponent {
     bool enabled;
 
   public:
-    bool isEnabled() {
+    virtual bool isEnabled() {
         return enabled;
     }
 

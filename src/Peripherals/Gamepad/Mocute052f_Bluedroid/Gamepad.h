@@ -1,12 +1,12 @@
+#include "config.h"
+#ifdef GAMEPAD_MOCUTE052F_BLUEDROID
 #pragma once
 #include "Utilities/Typedefs.h"
 #include "BLEGamepadExample/controller.h"
-#include "Peripherals/BLEGamepad/InputHandler.h"
+#include "Peripherals/Gamepad/InputHandler.h"
 #include "main.h"
 
-namespace BLEGamepad {
-    extern InputHandler inputHandler;
-    
+namespace Gamepad {
     void init();
     void update();
     void onStartScan(u8 retryCount);
@@ -16,3 +16,5 @@ namespace BLEGamepad {
     void onBluetoothDisconnect();
     void onBluetoothBatteryEvent(u8 level);
 } 
+
+#endif

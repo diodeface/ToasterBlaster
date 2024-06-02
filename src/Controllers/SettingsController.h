@@ -23,23 +23,10 @@ class SettingsController : public Controller {
     
     u8 statusScreenItemY;
     const u8 statusScreenItemYIncrement = 8;
-    //const u8 statusScreenItemX = 43;
     const u8 statusScreenItemX = 0;
-
-    void drawLogo(u8 x, u8 y) {
-        displayManager->hud->drawFrame(x, y + 9, 38, 10);
-        displayManager->hud->drawBox(x, y + 18, 38, 10);
-        displayManager->hud->setDrawColor(0);
-        displayManager->hud->drawStr(x + 2, y + 26, "BLASTER");
-        displayManager->hud->setDrawColor(1);
-        displayManager->hud->drawStr(x + 2, y + 17, "Toaster");
-        displayManager->hud->drawStr(x + 2, y + 7, "Adeon's");
-        displayManager->hud->drawStr(x, y + 36, Config::VERSION_NUMBER);
-    }
 
     void initStatusScreen() {
         displayManager->hud->clearBottom();
-        //drawLogo(0, 16);
         displayManager->hud->drawCenteredText(0, 64, 26, "Push up/down for settings");
     }
 
@@ -118,7 +105,7 @@ class SettingsController : public Controller {
         }
 
         TOASTER_LOG(
-            "Setting %d/%d: %s - %s, %d/%d", 
+            "Setting %d/%d: %s - %s, %d/%d\n", 
             settingCursor + 1, settingsManager->getSettings().size(), 
             setting->getName(), setting->getDescription(),
             setting->getValue(), setting->getMaxValue()
@@ -127,7 +114,7 @@ class SettingsController : public Controller {
 
   public:
     SettingsController(DisplayManager* displayManager, SettingsManager* settingsManager)
-        : Controller(CONTROLLER_STATUS, SP_NONE)
+        : Controller(CONTROLLER_SETTINGS, SP_NONE)
         , displayManager(displayManager)
         , settingsManager(settingsManager) {
         settingCursor = 255;
@@ -138,14 +125,16 @@ class SettingsController : public Controller {
         if(settingCursor == 255) {
             beginStatusScreenDraw();
             drawStatusScreenItem("BT %22s", btStatus);
-            drawStatusScreenItem("FPS %21d", (1000000 / deltaTime));
-            drawStatusScreenItem("Heap %20d", esp_get_free_heap_size());
-            drawStatusScreenItem("Boops %19d", boopCount);
             drawStatusScreenItem("Uptime %18s", uptime);
+            drawStatusScreenItem("Boops %19d", boopCount);
         } else if (settingCursor == 254) { 
             beginStatusScreenDraw();
             drawStatusScreenItem("Frame %19d", frameCount);
-            drawStatusScreenItem("Mic %21d", micValue);
+            drawStatusScreenItem("FPS %21d", (1000000 / deltaTime));
+            drawStatusScreenItem("Heap %20d", esp_get_free_heap_size());
+            //drawStatusScreenItem("Mic %21d", micValue);
+            drawStatusScreenItem("Version %17s", VERSION_NUMBER);
+            drawStatusScreenItem("%25s", COMPILE_TIMESTAMP);
         }
     }
 

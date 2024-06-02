@@ -27,9 +27,13 @@ EyeBlink* eyeBlink;
 LEDStrip* ledStrip;
 UptimeCounter* uptimeCounter;
 PWMFan* fanControl;
+InputHandler inputHandler;
 
 void setup() {
-    TOASTER_LOG("\n\n\n\nStarting up...\n");
+    TOASTER_LOG("\n\n\n\n\n\n%s %s\n", PROJECT_NAME, VERSION_NUMBER);
+    TOASTER_LOG("Compiled %s\n", COMPILE_TIMESTAMP);
+    TOASTER_LOG("%s%s\n\n", LINK_1, LINK_2);
+
     randomSeed(analogRead(0));
     EEPROM.begin(16);
 
@@ -58,8 +62,8 @@ void setup() {
 
     ledStrip = new LEDStrip(EEPROM.read(Config::EEPROM::LEDSTRIP));
 
-    #ifdef BT_CONTROLLER
-    BLEGamepad::init();
+    #ifdef BT_GAMEPAD
+    Gamepad::init();
     createButtonMapping();
     #endif
 
@@ -73,7 +77,7 @@ void setup() {
         EEPROM.read(Config::EEPROM::AUTO_BLINK)
     );
 
-    sequencePlayer = new SequencePlayer(displayManager, displayTweenManager, ledStrip, eyeBlink, &Sequences::startup, EEPROM.read(Config::EEPROM::RARE_TRANSITION_CHANCE), true);
+    sequencePlayer = new SequencePlayer(displayManager, displayTweenManager, eyeBlink, &Sequences::startup, EEPROM.read(Config::EEPROM::RARE_TRANSITION_CHANCE), true);
     
     sequencePlayer->addCommonTransitions({
         &Transitions::blink,
@@ -85,11 +89,12 @@ void setup() {
         &Transitions::slide,
         &Transitions::losePower,
         &Transitions::glitch,
-        //&Transitions::expand,  // having all the LEDs on may cause a voltage drop and crash the ESP32
+        //&Transitions::expand,  // having all the LEDs on may cause a voltage drop and crash the ESP32, only use this with a good power source
         &Transitions::explode,
         //&Transitions::shuffle,
         &Transitions::fizz,
         &Transitions::doomMelt,
+        //&Transitions::pulse
     });
 
     /*
@@ -115,7 +120,7 @@ void setup() {
 
     createSettingsMenu();
 
-    controller = new StartupController(displayManager, 4 SECONDS, [](){changeController(new SettingsController(displayManager, settingsManager));});
+    controller = new StartupController(displayManager, 3 SECONDS, [](){changeController(new SettingsController(displayManager, settingsManager));});
     
     uptimeCounter = new UptimeCounter();
 
@@ -129,9 +134,10 @@ void loop(){
     if(deltaTime < Config::FRAMETIME) return;
     lastTime = micros();
 
-    #ifdef BT_CONTROLLER
-    BLEGamepad::update();
+    #ifdef BT_GAMEPAD
+    Gamepad::update();
     #endif
+    inputHandler.update();
     sequencePlayer->update();
     controller->update();
     displayTweenManager->update();
@@ -159,18 +165,13 @@ void changeController(Controller* newController) {
     controller = newController;
 }
 
-void handleJoystickInput(u8 x, u8 y) {
-    BT_LOG("Joystick input (%d, %d)\n", x, y);
-    controller->handleInput(x, y);
-}
-
-#ifdef BT_CONTROLLER
+#ifdef BT_GAMEPAD
 void createButtonMapping() {
-    BLEGamepad::inputHandler.mapButtonsToJoystick(BTN_UP, BTN_DOWN, BTN_LEFT, BTN_RIGHT, handleJoystickInput);
-    BLEGamepad::inputHandler.mapButtonsToJoystick(BTN_ALT_UP, BTN_ALT_DOWN, BTN_ALT_LEFT, BTN_ALT_RIGHT, handleJoystickInput);
-    BLEGamepad::inputHandler.mapButtonsToJoystick(BTN_ALT_X, BTN_ALT_B, BTN_ALT_A, BTN_ALT_Y, handleJoystickInput);
+    inputHandler.mapButtonsToJoystick(BTN_UP, BTN_DOWN, BTN_LEFT, BTN_RIGHT, handleJoystickInput);
+    inputHandler.mapButtonsToJoystick(BTN_ALT_UP, BTN_ALT_DOWN, BTN_ALT_LEFT, BTN_ALT_RIGHT, handleJoystickInput);
+    inputHandler.mapButtonsToJoystick(BTN_ALT_X, BTN_ALT_B, BTN_ALT_A, BTN_ALT_Y, handleJoystickInput);
 
-    BLEGamepad::inputHandler.mapButtons({
+    inputHandler.mapButtons({
         {BTN_TRIG1, BTN_STATE_PRESSED, [](){ 
             eyeBlink->handleInput(true); 
         }},
@@ -292,4 +293,34 @@ void createSettingsMenu() {
             [](i8 value) { EEPROM.commit(); }
         ),
     });
+}
+
+ButtonDebounce debounceX, debounceY;
+u8 prevX, prevY;
+// filters out raw joystick data and sends to the active controller
+void handleJoystickInput(u8 x, u8 y) {
+    // round and debounce
+    u8 rX = roundAnalogValue(x);
+    u8 rY = roundAnalogValue(y);
+
+    if (rX == 0x80) debounceX.reset();
+    else if (debounceX.shouldActivate()) controller->handleInput(rX, 0x80);
+
+    if (rY == 0x80) debounceY.reset();
+    else if (debounceY.shouldActivate()) controller->handleInput(0x80, rY);
+
+    // send raw joystick data to the active controller if needed
+    if (prevX != x || prevY != y) {
+        controller->handleRawInput(x, y);
+    }
+
+    prevX = x;
+    prevY = y;
+}
+
+void safeMode() {
+    if (controller->getType() != CONTROLLER_SETTINGS || sequencePlayer->getSequence() != &Sequences::neutral) {
+        changeController(new SettingsController(displayManager, settingsManager));
+        sequencePlayer->transitionSequence(&Sequences::neutral);
+    }
 }

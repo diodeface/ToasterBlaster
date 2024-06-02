@@ -7,7 +7,6 @@
 #include "Drawing/DisplayManager.h"
 #include "Animation/Interpolation/TweenManager.h"
 #include "Animation/Sequence/Sequences.h"
-#include "Peripherals/LEDStrip.h"
 #include "Animation/EyeBlink.h"
 
 #define CURRENT sequence->keyframes[index]
@@ -31,8 +30,7 @@ class SequencePlayer : public ToasterComponent {
     std::vector<Transition*> commonTransitions;
     std::vector<Transition*> rareTransitions;
     u8 rareTransitionChance;
-    LEDStrip* ledStrip;
-    EyeBlink* eyeBlink; // todo: add a pre and post transition callback, this is kinda jank
+    EyeBlink* eyeBlink; // todo: before and after transition callbacks, this is kinda jank
 
     /**
      * Go to the keyframe defined by the "next" value in the current keyframe.
@@ -57,7 +55,6 @@ class SequencePlayer : public ToasterComponent {
     SequencePlayer(
         DisplayManager* displayManager, 
         TweenManager* tweenManager, 
-        LEDStrip* ledStrip, 
         EyeBlink* eyeBlink,
         Sequence* sequence, 
         u8 rareTransitionChance = 10, 

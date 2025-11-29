@@ -1,24 +1,27 @@
 /**
  * Adeon's Toaster Blaster
  * ---------------------------------------------------------------------------
- * This is a LED control program for protogen helmets to be used with MAX7219
+ * This is an LED control program for protogen helmets to be used with MAX7219
  * LED matrixes and ESP32 dev boards. Keyframe animation system allows you
  * to create animations with ease. Facial expressions are controlled with an
  * inexpensive bluetooth controller (MOCUTE-052F), with more gamepads to be
  * supported in the future.
  * 
- * This is a pre-release with a some bugs, unfinished code and 
+ * This is a pre-release with some bugs, unfinished code and 
  * lacking documentation. Use at your own risk.
  */
 
 #include <Arduino.h>
 #include "main.h"
 
+Matrix* matrix;
 DisplayManager* displayManager;
 SequencePlayer* sequencePlayer;
 Controller* controller;
 TaskHandle_t asyncLoopTask;
 Timestamp lastTime;
+AnimatedMouth* animatedMouth;
+
 SettingsManager* settingsManager;
 HeadsUpDisplay* hud;
 TweenManager* displayTweenManager;
@@ -34,15 +37,12 @@ void setup() {
     TOASTER_LOG("Compiled %s\n", COMPILE_TIMESTAMP);
     TOASTER_LOG("%s%s\n\n", LINK_1, LINK_2);
 
-    randomSeed(analogRead(0));
-    EEPROM.begin(16);
+    EEPROM.begin(SETTING_COUNT + 4);    // Settings checksum is stored at address `SETTING_COUNT`
 
     hud = new U8G2HUDWrapper(Config::Pins::HUD_SCL, Config::Pins::HUD_SDA);
-
-    displayManager = new DisplayManager(
-        new Max7219(Config::Pins::MATRIX_DIN, Config::Pins::MATRIX_CS, Config::Pins::MATRIX_CLK), hud, EEPROM.read(Config::EEPROM::MATRIX)
-    );
-
+    matrix = new Max7219(Config::Pins::MATRIX_DIN, Config::Pins::MATRIX_CS, Config::Pins::MATRIX_CLK, SettingsManager::getSavedValue(SETTING_MATRIX_BRIGHTNESS));
+    matrix->clear();
+    displayManager = new DisplayManager(matrix, hud, SettingsManager::getSavedValue(SETTING_ENABLE_MATRIX));
     displayTweenManager = new TweenManager([](){displayManager->requestRedraw();});
 
     // Register displays (matrix position, number of rows (size), bitmask, hud preview position)
@@ -58,9 +58,10 @@ void setup() {
     });
 
     // To add persistent rotation or other effects to your displays, add a global effect:
-    // displayManager->addGlobalEffect(new Rotate180(ALL));
+    //displayManager->addGlobalEffect(new Rotate180(ALL));
 
-    ledStrip = new LEDStrip(EEPROM.read(Config::EEPROM::LEDSTRIP));
+    //ledStrip = new LEDStrip(SettingsManager::getSavedValue(SETTING_ENABLE_LEDSTRIP));     // spinning color LED strip animation
+    ledStrip = new LEDStripCD(SettingsManager::getSavedValue(SETTING_ENABLE_LEDSTRIP));     // optical disc LED strip animation
 
     #ifdef BT_GAMEPAD
     Gamepad::init();
@@ -74,14 +75,16 @@ void setup() {
         &Overlays::EyeBlink::opening,
         5 SECONDS,
         20 SECONDS,
-        EEPROM.read(Config::EEPROM::AUTO_BLINK)
+        40 MILLIS,
+        200 MILLIS,
+        SettingsManager::getSavedValue(SETTING_ENABLE_AUTO_BLINK)
     );
 
-    sequencePlayer = new SequencePlayer(displayManager, displayTweenManager, eyeBlink, &Sequences::startup, EEPROM.read(Config::EEPROM::RARE_TRANSITION_CHANCE), true);
+    sequencePlayer = new SequencePlayer(displayManager, displayTweenManager, eyeBlink, &Sequences::startup, SettingsManager::getSavedValue(SETTING_RARE_TRANSITION_CHANCE), true);
     
     sequencePlayer->addCommonTransitions({
         &Transitions::blink,
-        &Transitions::crossfade
+        //&Transitions::crossfade
     });
 
     sequencePlayer->addRareTransitions({
@@ -89,13 +92,17 @@ void setup() {
         &Transitions::slide,
         &Transitions::losePower,
         &Transitions::glitch,
-        //&Transitions::expand,  // having all the LEDs on may cause a voltage drop and crash the ESP32, only use this with a good power source
         &Transitions::explode,
-        //&Transitions::shuffle,
         &Transitions::fizz,
         &Transitions::doomMelt,
+        //&Transitions::earthquake,
+        //&Transitions::expand,
+        //&Transitions::shuffle,
         //&Transitions::pulse
+        //&Transitions::modem
     });
+
+    animatedMouth = new AnimatedMouth(displayManager, 33 MILLIS, 500, 500, SettingsManager::getSavedValue(SETTING_ENABLE_ANIMATED_MOUTH));
 
     /*
     boopSensor = new DigitalBoopSensor(
@@ -106,32 +113,34 @@ void setup() {
     */
 
     boopSensor = new AnalogBoopSensor(
-        displayManager, new OverlayPlayer(displayManager, &Overlays::boop, false, false), 
-        &Overlays::boop,        // enable overlay
+        displayManager, new OverlayPlayer(displayManager, &Overlays::Boop::boop, false, false), 
+        &Overlays::Boop::boop,  // enable overlay
         &Transitions::glitch,   // disable overlay
         Config::Pins::BOOP_ANALOG, Config::BOOP_TRIGGER_COUNT, Config::BOOP_TRIGGERS_MAX, 
-        (f32)EEPROM.read(Config::EEPROM::BOOP_TRIGGER_MULTIPLIER) * 0.01f,  // trigger multiplier
+        ((f32)SettingsManager::getSavedValue(SETTING_BOOP_TRIGGER_MULTIPLIER)) / 255.0f,  // trigger multiplier
         200,   // calibration readings
         false, // invert
-        EEPROM.read(Config::EEPROM::BOOP_SENSOR)   // enable
+        SettingsManager::getSavedValue(SETTING_ENABLE_BOOP_SENSOR)   // enable
     );
 
-    fanControl = new PWMFan(Config::Pins::FAN_PWM, Config::FAN_PWM_CHANNEL, EEPROM.read(Config::EEPROM::FAN_PWM_SPEED));
+    fanControl = new PWMFan(Config::Pins::FAN_PWM, Config::FAN_PWM_CHANNEL, SettingsManager::getSavedValue(SETTING_FAN_PWM_SPEED));
 
-    createSettingsMenu();
-
-    controller = new StartupController(displayManager, 3 SECONDS, [](){changeController(new SettingsController(displayManager, settingsManager));});
-    
     uptimeCounter = new UptimeCounter();
 
-    xTaskCreatePinnedToCore(loopAsync, "loopAsync", 2048, NULL, 1, &asyncLoopTask, 1);
+    settingsManager = new SettingsManager();
+    createSettingsMenu();
+    if(!settingsManager->init()) ESP.restart();
+
+    controller = new StartupController(displayManager, 3 SECONDS, [](){changeController(new SettingsController(displayManager, settingsManager));});
+
+    xTaskCreatePinnedToCore(loopAsync, "loopAsync", 2048, NULL, 1, &asyncLoopTask, 0);
 }
 
 // Main program loop
 void loop(){
     // calculate delta time
     deltaTime = (Timestamp)(micros() - lastTime);
-    if(deltaTime < Config::FRAMETIME) return;
+    if(deltaTime < Config::FRAMETIME) return;       // intentionally limiting updates per second to avoid fixed point imprecision issues
     lastTime = micros();
 
     #ifdef BT_GAMEPAD
@@ -145,10 +154,11 @@ void loop(){
     eyeBlink->update();
     ledStrip->update();
     uptimeCounter->update();
+    animatedMouth->update();
     displayManager->update();
 }
 
-// Components to be updated independently on core 1
+// Components to be updated independently on core 0
 void loopAsync(void* pvParameters) {
     while(true) {
         hud->update();
@@ -179,17 +189,17 @@ void createButtonMapping() {
         {BTN_TRIG1, BTN_STATE_RELEASED, [](){ 
             eyeBlink->handleInput(false); 
         }},
+
+        {BTN_X, BTN_STATE_PRESSED, [](){
+            changeController( new FaceSwitcherController( displayManager, sequencePlayer, &Sequences::joyBlush, &Sequences::spooked, &Sequences::neutral, &Sequences::blushing, &Sequences::joy, &Sequences::angry, &Sequences::angryHappy, &Sequences::annoyed ));
+        }},
         
         {BTN_SELECT, BTN_STATE_PRESSED, [](){ 
-            changeController( new FaceSwitcherController( displayManager, sequencePlayer, &Sequences::heartEyes, &Sequences::dead, &Sequences::dizzy, &Sequences::questioning ));
+            changeController( new FaceSwitcherController( displayManager, sequencePlayer, &Sequences::heartEyes, &Sequences::questioning, &Sequences::dizzy, &Sequences::exclamation, &Sequences::dead, &Sequences::squinting, &Sequences::powerOff, &Sequences::wink ));
         }},
 
         {BTN_START, BTN_STATE_PRESSED, [](){ 
-            changeController( new FaceSwitcherController( displayManager, sequencePlayer, &Sequences::angry, &Sequences::annoyed, &Sequences::spooked, &Sequences::blushing ));
-        }},
-
-        {BTN_X, BTN_STATE_PRESSED, [](){
-            changeController( new FaceSwitcherController( displayManager, sequencePlayer, &Sequences::neutral, &Sequences::joy, &Sequences::squinting, &Sequences::angryHappy ));
+            changeController( new FaceSwitcherController( displayManager, sequencePlayer, &Sequences::crying, &Sequences::batteryCheck, &Sequences::uwu, &Sequences::randomize, &Sequences::nope, &Sequences::powerOff, &Sequences::owo, &Sequences::dizzy ));
         }},
 
         {BTN_A, BTN_STATE_PRESSED, [](){ 
@@ -205,11 +215,22 @@ void createButtonMapping() {
                 displayManager, sequencePlayer, 5 SECONDS, 20 SECONDS, {
                     &Sequences::neutral,
                     &Sequences::joy,
-                    &Sequences::squinting,
+                    &Sequences::joyBlush,
+                    &Sequences::blushing,
                     &Sequences::angryHappy,
-                    &Sequences::spooked,
                     &Sequences::angry,
-                    &Sequences::blushing
+                    &Sequences::annoyed,
+                    &Sequences::spooked,
+                    &Sequences::questioning,
+                    &Sequences::exclamation,
+                    &Sequences::dead,
+                    &Sequences::squinting,
+                    &Sequences::dizzy,
+                    &Sequences::heartEyes,
+                    &Sequences::powerOff,
+                    &Sequences::uwu,
+                    &Sequences::owo,
+                    &Sequences::crying,
                 })
             );
         }},
@@ -218,80 +239,86 @@ void createButtonMapping() {
 #endif
 
 void createSettingsMenu() {
-    settingsManager = new SettingsManager();
-
     settingsManager->addSettings({
         new LambdaSetting(
-            "Matrix", "Brightness", 15, 
-            []() -> u8 { return displayManager->getMatrixBrightness(); },
-            [](i8 value) { displayManager->addMatrixBrightness(value * 3); }, 
-            Config::EEPROM::MATRIX_BRIGHTNESS
+            "Matrix",       // category
+            "Brightness",   // name
+            SETTING_MATRIX_BRIGHTNESS,  // unique key defined in Settings/SettingKeys.h enum SettingKey
+            SETTING_TYPE_PERCENTAGE,    // setting type, as defined in Settings/Setting.h enum SettingType
+            8, 0, 15, 1,        // default, minimum, maximum, increment values
+            []() -> u8 { return displayManager->getMatrixBrightness(); },       // getter returning u8
+            [](u8 value) { displayManager->setMatrixBrightness(value); }        // setter using u8
         ),
 
-        new ComponentToggleSetting("Matrix", "Enable", displayManager, Config::EEPROM::MATRIX),
+        new ComponentToggleSetting("Matrix", "Enable", SETTING_ENABLE_MATRIX, true, displayManager),        // category, name, unique key, default value, child of ToasterComponent
 
-        new ComponentToggleSetting("LED Strip", "Enable", ledStrip, Config::EEPROM::LEDSTRIP),
+        new ComponentToggleSetting("LED Strip", "Enable", SETTING_ENABLE_LEDSTRIP, true, ledStrip),
 
-        new ComponentToggleSetting("Auto blink", "Enable", eyeBlink, Config::EEPROM::AUTO_BLINK),
+        new ComponentToggleSetting("Auto blink", "Enable", SETTING_ENABLE_AUTO_BLINK, true, eyeBlink),
 
-        new ComponentToggleSetting("Boop sensor", "Enable", boopSensor, Config::EEPROM::BOOP_SENSOR),
-        
+        new ComponentToggleSetting("Boop sensor", "Enable", SETTING_ENABLE_BOOP_SENSOR, false, boopSensor),
+
         new LambdaSetting(
-            "Boop sensor", "Sensitivity", 100,
+            "Boop sensor",
+            "Sensitivity",
+            SETTING_BOOP_TRIGGER_MULTIPLIER,
+            SETTING_TYPE_PERCENTAGE,
+            127, 0, 255, 17,
             []() -> u8 { return boopSensor->getTriggerMultiplier(); }, 
-            [](i8 value) { boopSensor->addTriggerMultiplier(value); },
-            Config::EEPROM::BOOP_TRIGGER_MULTIPLIER
+            [](u8 value) { boopSensor->setTriggerMultiplier(value); }
         ),
 
-        new LambdaSetting(
-            "Boop sensor", "Calibrate", 0, // add function only
-            []() -> u8 { return 0; }, 
-            [](i8 value) { boopSensor->calibrate(); }
-        ),
+        new ActionSetting("Boop sensor", "Calibrate", [](u8 value) { boopSensor->calibrate(); }),       // category, name, function to be called
+
+        new ComponentToggleSetting("Mouth anim.", "Enable", SETTING_ENABLE_ANIMATED_MOUTH, false, animatedMouth),
+
+        new ActionSetting("Mouth anim.", "Calibrate", [](u8 value) { animatedMouth->reset(); }),
 
         new LambdaSetting(
-            "Transitions", "Rare chance %", 100,
+            "Rare transit.",
+            "Chance",
+            SETTING_RARE_TRANSITION_CHANCE,
+            SETTING_TYPE_PERCENTAGE,
+            25, 0, 255, 17,
             []() -> u8 { return sequencePlayer->getRareTransitionChance(); }, 
-            [](i8 value) { sequencePlayer->addRareTransitionChance(value * 10); },
-            Config::EEPROM::RARE_TRANSITION_CHANCE
+            [](u8 value) { sequencePlayer->setRareTransitionChance(value); }
         ),
 
         new LambdaSetting(
-            "Fan control", "Speed", 255,
+            "Fan speed",
+            "",
+            SETTING_FAN_PWM_SPEED,
+            SETTING_TYPE_PERCENTAGE,
+            255, 0, 255, 51,
             []() -> u8 { return fanControl->getSpeed(); }, 
-            [](i8 value) { fanControl->addSpeed(value * 51); },
-            Config::EEPROM::FAN_PWM_SPEED
+            [](u8 value) { fanControl->setSpeed(value); }
         ),
 
-        new LambdaSetting(
-            "Fun", "Snake Game", 0,
-            []() -> u8 { return 0; }, 
-            [](i8 value) { 
+        new ActionSetting(
+            "Misc.",
+            "Snake game",
+            [](u8 value) { 
+                animatedMouth->stop(); 
                 changeController(new SnakeGameController(displayManager, MOUTH, EYES, 200 MILLIS)); 
             }
         ),
 
-        new LambdaSetting(
-            "Fun", "Analyzer", 0,
-            []() -> u8 { return 0; }, 
-            [](i8 value) { 
+        /*
+        new ActionSetting(
+            "Misc.",
+            "Analyzer",
+            [](u8 value) { 
+                animatedMouth->stop(); 
                 changeController(new SpectrumAnalyzerController(displayManager)); 
             }
         ),
+        */
 
-        new LambdaSetting(
-            "Misc.", "Restart", 0,
-            []() -> u8 { return 0; }, 
-            [](i8 value) { 
-                ESP.restart();
-            }
-        ),
+        // new ActionSetting("Misc.", "Strobe test", [](u8 value) { changeController(new StrobeController(displayManager, sequencePlayer, displayTweenManager)); }),
 
-        new LambdaSetting(
-            "Misc.", "Save settings", 0, 
-            []() -> u8 { return 0; }, 
-            [](i8 value) { EEPROM.commit(); }
-        ),
+        new ActionSetting("System", "Restart", [](u8 value) { ESP.restart(); }),
+
+        new ActionSetting("System", "Save settings", [](u8 value) { settingsManager->saveSettings(); }),
     });
 }
 
@@ -319,8 +346,11 @@ void handleJoystickInput(u8 x, u8 y) {
 }
 
 void safeMode() {
-    if (controller->getType() != CONTROLLER_SETTINGS || sequencePlayer->getSequence() != &Sequences::neutral) {
+    if (controller->getType() != CONTROLLER_SETTINGS) {
         changeController(new SettingsController(displayManager, settingsManager));
+    }
+    Sequence* s = sequencePlayer->getSequence();
+    if (s != &Sequences::neutral && s != &Sequences::startup) {
         sequencePlayer->transitionSequence(&Sequences::neutral);
     }
 }

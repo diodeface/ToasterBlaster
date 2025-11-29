@@ -1,11 +1,19 @@
-# Toaster Blaster
 
-This is a LED control program for protogen helmets to be used with MAX7219 LED matrixes and ESP32 dev boards. 
+<p align="middle"> 
+    <img src="docs/images/splash_big.png" height="300" />
+</p>
 
-![Preview](docs/preview.gif)
+<p float="left" align="middle">
+    <img src="docs/images/preview.gif" height="150" />
+    <img src="docs/images/hud_1.jpg" height="150" />
+    <img src="docs/images/hud_2.jpg" height="150" />
+</p>
 
-*Note that this is a pre-release with some bugs, unfinished code and a major lack of documentation.*<br>
-*Use at your own risk.*<br><br>
+<p align="middle"> 
+This is an LED control program for protogen helmets to be used with MAX7219 LED matrixes and ESP32 dev boards.<br><br>
+Note that this is a pre-release with some bugs, unfinished code and a major lack of documentation.<br>
+Use at your own risk.
+</p>
 
 # Setup
 *For now I can provide a brief setup guide as I don't have time to write detailed documentation. Sorry!*<br><br>
@@ -19,9 +27,8 @@ The following hardware is supported, with more to come in the future:
 - MOCUTE 052 Bluetooth Gamepad
 - TCRT5000 Infrared obstacle avoidance sensor (Boop sensor, analog and digital)
 - WS2812 LED strip or something similar supported by the FastLED library
+- MAX9814 Electret microphone module
 - Any 5V PWM controlled fan (Noctua NF-A4x20 5V PWM)
-
-Optional MAX4466 amplified microphone module can be used for mouth animation and spectrum analyzer. I've had the MAX7219 display drivers cause a lot of unwanted interference, so it's best to not use the microphone for now.
 
 Most if not all hardware can be purchased on sites like aliexpress or ebay. <br><br>
 
@@ -60,7 +67,7 @@ Both 3.3V or 5V should work for power<br><br>
 **For better tracking and easier calibration use the analog output.**
 | TCRT5000 | ESP32 |
 | - | - |
-| A0 | 39 (SN) for analog |
+| A0 | 39 (marked SN or VN) for analog |
 | D0 | 19 for digital |
 
 Use 3.3V for power<br><br>
@@ -71,6 +78,15 @@ Use 3.3V for power<br><br>
 | DIN | 15 |
 
 Use an **external** 5V power supply<br><br>
+
+### MAX9814 Electret microphone module
+| MAX9814 | ESP32 |
+| - | - |
+| DIN | 36 (marked VP) |
+
+Connect VDD to 3.3V<br>
+Connect AR to GND for a 1:500 attack/release ratio<br>
+Connect GAIN to VDD for a 40dB gain<br>
 
 ### Fan PWM Control
 | Fan header | ESP32 |
@@ -87,8 +103,12 @@ Use an **external** 5V power supply<br><br>
 - Turn on your gamepad and flip **KEY/GAME** switch to **GAME** position.
 - Enjoy!
 
-*todo: Settings like matrix brightness or boop sensor sensitivity currently don't have a way to restore default values, therefore you'll need to adjust them to your liking.*<br><br>
-
+## Testing without hardware
+- Included are diagram.json and wokwi.toml files for testing using the [Wokwi Simulator](https://marketplace.visualstudio.com/items?itemName=wokwi.wokwi-vscode) plugin for VS Code.
+- Install the plugin according to the [Wokwi documentation](https://docs.wokwi.com/vscode/getting-started#installation).
+- Build the program first with PlatformIO **(Ctrl+Alt+B)**. Then, press **F1** and select **Wokwi: Start Simulator**
+- If nothing happens for a while, try disabling the gamepad in config.h and try again.
+- Note that the simulation is going to be considerably slower than hardware. I only recommend using this approach for quickly testing new ideas without hardware.
 
 ## Default controller mapping
 The default button mapping in "GAME" mode is as follows:
@@ -101,9 +121,7 @@ The default button mapping in "GAME" mode is as follows:
 | B | Show Stats/Settings (SettingsController) |
 | A | Calibrate analog boop sensor |
 
-In "KEY" mode, both joystick and ABXY buttons trigger controller actions.
-
-<br>
+"KEY" mode is currently unsupported.
 
 ## (todo) Quick configuration
 - Important configuration constants can be found in [config.h](src/config.h)

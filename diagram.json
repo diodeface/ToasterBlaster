@@ -1,0 +1,155 @@
+{
+  "version": 1,
+  "author": "diodeface",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    {
+      "type": "board-ssd1306",
+      "id": "oled1",
+      "top": 233.54,
+      "left": 0.23,
+      "attrs": { "i2cAddress": "0x3C" }
+    },
+    {
+      "type": "wokwi-max7219-matrix",
+      "id": "matrix1",
+      "top": -66.6,
+      "left": -254.18,
+      "attrs": { "chain": "2", "layout": "fc16" }
+    },
+    {
+      "type": "wokwi-led-ring",
+      "id": "ring1",
+      "top": 151.27,
+      "left": -200.19,
+      "rotate": 270,
+      "attrs": { "pixels": "12" }
+    },
+    {
+      "type": "wokwi-max7219-matrix",
+      "id": "matrix2",
+      "top": 67.8,
+      "left": -414.96,
+      "attrs": { "chain": "4", "layout": "fc16" }
+    },
+    {
+      "type": "wokwi-max7219-matrix",
+      "id": "matrix3",
+      "top": -66.6,
+      "left": -466.59,
+      "attrs": { "chain": "1", "layout": "fc16" }
+    },
+    {
+      "type": "wokwi-max7219-matrix",
+      "id": "matrix4",
+      "top": -66.6,
+      "left": -591.39,
+      "attrs": { "chain": "1", "layout": "fc16" }
+    },
+    {
+      "type": "wokwi-max7219-matrix",
+      "id": "matrix5",
+      "top": -66.6,
+      "left": -878.18,
+      "attrs": { "chain": "2", "layout": "fc16" }
+    },
+    {
+      "type": "wokwi-max7219-matrix",
+      "id": "matrix6",
+      "top": 67.8,
+      "left": -866.16,
+      "attrs": { "chain": "4", "layout": "fc16" }
+    },
+    {
+      "type": "wokwi-led-ring",
+      "id": "ring2",
+      "top": 276.07,
+      "left": -200.19,
+      "rotate": 270,
+      "attrs": { "pixels": "12" }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot1",
+      "top": 28.6,
+      "left": 194.1,
+      "rotate": 90,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text1",
+      "top": 38.4,
+      "left": 268.8,
+      "attrs": { "text": "TCRT5000\nBoop" }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot2",
+      "top": 153.4,
+      "left": 194.1,
+      "rotate": 90,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text2",
+      "top": 163.2,
+      "left": 268.8,
+      "attrs": { "text": "MAX9814\nMicrophone" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "matrix1:V+", "esp:VIN", "red", [ "h57.6", "v225.7" ] ],
+    [ "matrix2:V+.2", "matrix3:V+", "red", [ "h-47.84", "v-67.2", "h153.6", "v-67.2" ] ],
+    [ "matrix1:V+.2", "matrix2:V+", "red", [ "h-45.42", "v67.2", "h268.8", "v67.2" ] ],
+    [ "matrix3:V+.2", "matrix4:V+", "red", [ "v0" ] ],
+    [ "matrix6:V+", "matrix4:V+.2", "red", [ "h48", "v-67.2", "h-153.6", "v-67.2" ] ],
+    [ "matrix6:V+.2", "matrix5:V+", "red", [ "h-47.84", "v-67.2", "h268.8", "v-67.2" ] ],
+    [ "matrix1:GND", "esp:GND.2", "black", [ "h48", "v206.6" ] ],
+    [ "matrix2:GND.2", "matrix3:GND", "black", [ "h-38.24", "v-67.2", "h134.4", "v-67.2" ] ],
+    [ "matrix1:GND.2", "matrix2:GND", "black", [ "h-35.82", "v67.2", "h249.6", "v67.2" ] ],
+    [ "matrix3:GND.2", "matrix4:GND", "black", [ "h0" ] ],
+    [ "matrix6:GND", "matrix4:GND.2", "black", [ "h38.4", "v-67.2", "h-134.4", "v-67.2" ] ],
+    [ "matrix6:GND.2", "matrix5:GND", "black", [ "h-38.24", "v-67.2", "h249.6", "v-67.2" ] ],
+    [ "matrix1:DIN", "esp:D23", "green", [ "h182.4", "v52.8" ] ],
+    [ "matrix2:DOUT", "matrix3:DIN", "green", [ "h-28.64", "v-67.2", "h115.2", "v-86.4" ] ],
+    [ "matrix1:DOUT", "matrix2:DIN", "green", [ "h-26.22", "v67.2", "h230.4", "v67.2" ] ],
+    [ "matrix3:DOUT", "matrix4:DIN", "green", [ "h0" ] ],
+    [ "matrix6:DIN", "matrix4:DOUT", "green", [ "h28.8", "v-67.2", "h-115.2", "v-67.2" ] ],
+    [ "matrix6:DOUT", "matrix5:DIN", "green", [ "h-28.64", "v-67.2", "h230.4", "v-67.2" ] ],
+    [ "matrix1:CS", "esp:D5", "gold", [ "h192", "v110.5" ] ],
+    [ "matrix2:CS.2", "matrix3:CS", "gold", [ "h-19.04", "v-67.2", "h96", "v-67.2" ] ],
+    [ "matrix1:CS.2", "matrix2:CS", "gold", [ "h-16.62", "v67.2", "h211.2", "v67.2" ] ],
+    [ "matrix3:CS.2", "matrix4:CS", "gold", [ "h0" ] ],
+    [ "matrix6:CS", "matrix4:CS.2", "gold", [ "h19.2", "v-67.2", "h-96", "v-67.2" ] ],
+    [ "matrix6:CS.2", "matrix5:CS", "gold", [ "h-19.04", "v-67.2", "h211.2", "v-67.2" ] ],
+    [ "matrix1:CLK", "esp:D18", "blue", [ "h201.6", "v91.3" ] ],
+    [ "matrix2:CLK.2", "matrix3:CLK", "blue", [ "h-9.44", "v-67.2", "h76.8", "v-67.2" ] ],
+    [ "matrix1:CLK.2", "matrix2:CLK", "blue", [ "h-7.02", "v67.2", "h192", "v67.2" ] ],
+    [ "matrix3:CLK.2", "matrix4:CLK", "blue", [ "h0" ] ],
+    [ "matrix6:CLK", "matrix4:CLK.2", "blue", [ "h9.6", "v-67.2", "h-76.8", "v-67.2" ] ],
+    [ "matrix6:CLK.2", "matrix5:CLK", "blue", [ "h-9.44", "v-67.2", "h192", "v-67.2" ] ],
+    [ "ring1:VCC", "esp:VIN", "red", [ "h28.8", "v-67.2" ] ],
+    [ "ring1:GND", "esp:GND.2", "black", [ "h19.2", "v-96" ] ],
+    [ "oled1:GND", "esp:GND.1", "black", [ "v-9.6", "h86.4", "v-81.4" ] ],
+    [ "oled1:VCC", "esp:3V3", "red", [ "v-19.2", "h86.55", "v-62.3" ] ],
+    [ "oled1:SCL", "esp:D22", "orange", [ "v-28.8", "h86.7", "v-177.2" ] ],
+    [ "oled1:SDA", "esp:D21", "green", [ "v-38.4", "h86.47", "v-138.7" ] ],
+    [ "esp:D15", "ring1:DIN", "magenta", [ "h13.9", "v186.9", "h-124.8", "v-115.2" ] ],
+    [ "ring1:GND", "ring2:GND", "black", [ "h19.2", "v124.8" ] ],
+    [ "ring1:VCC", "ring2:VCC", "red", [ "h28.8", "v124.81" ] ],
+    [ "ring1:DOUT", "ring2:DIN", "purple", [ "h9.6", "v134.41" ] ],
+    [ "esp:VN", "pot1:SIG", "cyan", [ "h23.8", "v-44", "h134.4", "v67.6" ] ],
+    [ "pot1:VCC", "esp:3V3", "red", [ "h-38.4", "v80.9" ] ],
+    [ "pot1:GND", "esp:GND.1", "black", [ "h-28.8", "v91.4" ] ],
+    [ "pot2:VCC", "esp:3V3", "red", [ "h-38.4", "v-43.9" ] ],
+    [ "pot2:GND", "esp:GND.1", "black", [ "h-28.8", "v-33.4" ] ],
+    [ "esp:VP", "pot2:SIG", "yellow", [ "h33.4", "v-24.4", "h144", "v182.8" ] ]
+  ],
+  "serialMonitor": { "display": "always", "newline": "lf", "convertEol": false },
+  "dependencies": {}
+}

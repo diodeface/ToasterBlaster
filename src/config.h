@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Utilities/Typedefs.h"
+#include "Typedefs.h"
 #include "Arduino.h"
 #include <vector>
 
@@ -9,8 +9,7 @@
  */
 
 // Bluetooth Gamepad selection
-#define GAMEPAD_MOCUTE052F_NIMBLE
-//#define GAMEPAD_MOCUTE052F_BLUEDROID
+#define GAMEPAD_MOCUTE052F_NIMBLE       // default "mocute" gamepad
 
 namespace Config {
     // Pin numbers for components
@@ -36,6 +35,10 @@ namespace Config {
 
     namespace Displays {
         const u8 
+        NUM_DISPLAYS = 14;     // number of chained MAX7219 devices
+        // BREADBOARD
+        
+        const u8 
         POS_EYE_L =     96,    // eye left
         POS_EYE_R =     0,     // eye right
         POS_MOUTH_L =   64,    // mouth left
@@ -44,7 +47,8 @@ namespace Config {
         POS_NOSE_R =    48;    // nose left
 
         // Display Bitmasks (identifier)
-        // Leave these unless you want to remap displays
+        // Leave these unless you want to add or remap displays
+        // If more than 7 displays are required, change the type of DisplayBitmask in Typedefs.h to u16 or u32
         const DisplayBitmask
         EYE_L =         1,        // eye left
         EYE_R =         1 << 1,   // eye right
@@ -64,30 +68,12 @@ namespace Config {
     }
 
     namespace Bluetooth {
-        // Bluetooth gamepad name 
-        // static const char* DEVICE_NAME = "Game-Pad";
+        // Bluetooth gamepad name
         static const char* DEVICE_NAME = "MOCUTE-052Fe-AUTO";
     }
 
-    // EEPROM addresses for saving certain settings, changing this will likely mess up your settings
-    namespace EEPROM {
-        const u8
-        SIZE = 16,
-        MATRIX_BRIGHTNESS = 0,
-        BOOP_SENSOR = 1,
-        AUTO_BLINK = 2,
-        FAN_PWM_SPEED = 3,
-        MATRIX = 4,
-        LEDSTRIP = 5,
-        BOOP_TRIGGER_MULTIPLIER = 6,
-        RARE_TRANSITION_CHANCE = 7,
-        ANIMATED_MOUTH = 8,
-        ANIMATED_MOUTH_NOISE_FLOOR = 9,
-        ANIMATED_MOUTH_PEAK_MIN = 10;
-    }
-
     // Miscellaneous settings, best to leave these as is
-    const u16 FPS_LIMIT = 120;
+    const u16 FPS_LIMIT = 120;  // Framerate is limited to avoid fixed point number inaccuracy related issues
     const Timestamp FRAMETIME = 1000000 / FPS_LIMIT;
 
     // default duration for keyframes
@@ -98,7 +84,6 @@ namespace Config {
     const u8 
     BOOP_TRIGGER_COUNT = 4,             // how many updates to wait until boop animation triggers
     BOOP_TRIGGERS_MAX = 6,              // maximum value for boop activation (must be higher than activation threshold)
-    FAN_INITIAL_SPEED = 255,
     FAN_PWM_CHANNEL = 0,
     FAN_PWM_RESOLUTION = 8;
     const u32 FAN_PWM_FREQUENCY = 25000;

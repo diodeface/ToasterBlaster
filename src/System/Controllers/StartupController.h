@@ -52,9 +52,9 @@ class StartupController : public Controller {
 
     void drawFace() {
         displayManager->hud->setDrawBuffer(HUD_BUFFER_SUB);
-        Bitmap* eye = Bitmaps::eyeBitmaps[random(Bitmaps::eyeBitmaps.size())];
-        Bitmap* nose = Bitmaps::noseBitmaps[random(Bitmaps::noseBitmaps.size())];
-        Bitmap* mouth = Bitmaps::mouthBitmaps[random(Bitmaps::mouthBitmaps.size())];
+        Bitmap* eye = Bitmaps::EyeBitmaps[random(Bitmaps::EyeBitmaps.size())];
+        Bitmap* nose = Bitmaps::NoseBitmaps[random(Bitmaps::NoseBitmaps.size())];
+        Bitmap* mouth = Bitmaps::MouthBitmaps[random(Bitmaps::MouthBitmaps.size())];
         displayManager->hud->drawBitmap(eye, 16, 48, 35);
         displayManager->hud->drawBitmap(nose, 8, 77, 35);
         displayManager->hud->drawBitmap(mouth, 32, 51, 46);

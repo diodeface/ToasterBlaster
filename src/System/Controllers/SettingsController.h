@@ -114,10 +114,11 @@ class SettingsController : public Controller {
         displayManager->hud->drawStr(0, 56, buf);
 
         TOASTER_LOG(
-            "Setting %d/%d: %s, Value: %d, Min: %d, Max: %d\n", 
+            "Setting %d/%d: %s - %s, Value: %d, Min: %d, Max: %d\n", 
             settingCursor + 1, 
             settingsManager->getSettings().size(), 
             setting->getName(),
+            setting->getDescription(),
             setting->getValue(), 
             setting->getMinValue(),
             setting->getMaxValue()

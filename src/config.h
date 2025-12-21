@@ -36,7 +36,6 @@ namespace Config {
     namespace Displays {
         const u8 
         NUM_DISPLAYS = 14;     // number of chained MAX7219 devices
-        // BREADBOARD
         
         const u8 
         POS_EYE_L =     96,    // eye left

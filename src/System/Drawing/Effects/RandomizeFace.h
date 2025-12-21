@@ -19,9 +19,9 @@ class RandomizeFace : public Effect {
     std::vector<SafeBitmapDraw> bitmapDraws;
 
     Bitmap* getRandomBitmap(u8 size) {
-        return size == 32 ? Bitmaps::mouthBitmaps[random(Bitmaps::mouthBitmaps.size())]
-            : size == 16  ? Bitmaps::eyeBitmaps[random(Bitmaps::eyeBitmaps.size())]
-                          : Bitmaps::noseBitmaps[random(Bitmaps::noseBitmaps.size())];
+        return size == 32 ? Bitmaps::MouthBitmaps[random(Bitmaps::MouthBitmaps.size())]
+            : size == 16  ? Bitmaps::EyeBitmaps[random(Bitmaps::EyeBitmaps.size())]
+                          : Bitmaps::NoseBitmaps[random(Bitmaps::NoseBitmaps.size())];
     }
 
     SafeBitmapDraw& getCurrentDraw(Display* display) {

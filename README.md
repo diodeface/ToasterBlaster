@@ -10,7 +10,7 @@
 </p>
 
 <p align="middle"> 
-This is an LED control program for protogen helmets to be used with MAX7219 LED matrixes and ESP32 dev boards.<br><br>
+This is an LED control program for protogen helmets to be used with MAX7219 LED matrixes and ESP32 dev boards.<br>
 Note that this is a pre-release with some bugs, unfinished code and a major lack of documentation.<br>
 Use at your own risk.
 </p>
@@ -123,6 +123,10 @@ The default button mapping in "GAME" mode is as follows:
 
 "KEY" mode is currently unsupported.
 
+## Editing face bitmaps:
+- Check the [Bitmaps directory](src/Assets/Bitmaps) containing images for eyes, mouth and nose. 
+- Images are converted from png to source code during the build process. Simply edit the images and rebuild (Ctrl+Alt+B).
+
 ## (todo) Quick configuration
 - Important configuration constants can be found in [config.h](src/config.h)
 - `setup()` function in [main.cpp](src/main.cpp) handles registering and initializing displays, peripherals, used transitions and overlays
@@ -135,9 +139,8 @@ The default button mapping in "GAME" mode is as follows:
 <br><br>
 
 ## (todo) Custom animations
-- Check [Bitmaps.h](src/Animation/Bitmaps.h), [Bitmaps.cpp](src/Animation/Bitmaps.cpp) for bitmap definitions
-- [Sequences.h](src/Animation/Sequence/Sequences.h), [Sequences.cpp](src/Animation/Sequence/Sequences.cpp) store animation sequences. Read the included [README](src/Animation/Sequence/README.txt) file.
-- [Transitions.h](src/Animation/Overlay/Transitions.h), [Transitions.cpp](src/Animation/Overlay/Transitions.cpp), [Overlays.h](src/Animation/Overlay/Overlays.h), [Overlays.cpp](src/Animation/Overlay/Overlays.cpp) for overlay sequences and transitions.
+- [Sequences.h](src/Assets/Sequences/Standard.h), [Sequences.cpp](src/Assets/Sequences/Standard.cpp) store animation sequences. Read the included [README](src/Assets/Sequences/README.txt) file.
+- [Transitions.h](src/Assets/Transitions/Standard.h), [Transitions.cpp](src/Assets/Transitions/Standard.cpp), [Overlays.h](src/Assets/Overlays/Standard.h), [Overlays.cpp](src/Animation/Overlay/Standard.cpp) for overlay sequences and transitions.
 <br><br>
 
 # (todo) Contributing
@@ -148,6 +151,7 @@ The default button mapping in "GAME" mode is as follows:
 - [FastLED/FastLED](https://github.com/FastLED/FastLED)
 - [kosme/arduinoFFT](https://github.com/kosme/arduinoFFT)
 - [MikeLankamp/fpm](https://github.com/MikeLankamp/fpm)
+- [h2zero/NimBLE-Arduino](https://github.com/h2zero/NimBLE-Arduino)
 
 # License
 This program is licensed under [GNU Affero General Public License v3.0](LICENSE).

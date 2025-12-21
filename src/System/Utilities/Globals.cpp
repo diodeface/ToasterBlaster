@@ -8,7 +8,7 @@ char btStatus[16] = "No Bluetooth";
 char uptime[16] = "";
 
 const char* PROJECT_NAME = "Toaster Blaster";
-const char* VERSION_NUMBER = "v0.5";
+const char* VERSION_NUMBER = "v0.5.1";
 const char* COMPILE_TIMESTAMP = __DATE__ " " __TIME__;
 const char* LINK_1 = "github.com/diodeface/";
 const char* LINK_2 = "ToasterBlaster";

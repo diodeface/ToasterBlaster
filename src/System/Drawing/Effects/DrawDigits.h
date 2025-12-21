@@ -22,7 +22,7 @@ class DrawDigits : public Effect {
 
     static void drawDigit(u8* buffer, size_t size, u8 digit, u8 x = 0) {
         for (u8 i = 0; i < 3; i++) {
-            SetColumn::setColumn(buffer, size, x+i, Bitmaps::Other::digits[digit][i]);
+            SetColumn::setColumn(buffer, size, x+i, Bitmaps::System::digits[digit][i]);
         }
         SetColumn::setColumn(buffer, size, x+3, 0);
     }

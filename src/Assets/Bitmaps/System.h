@@ -17,5 +17,8 @@ namespace Bitmaps {
             splash1[], 
             splash2[],
             visor[];
+
+        extern Bitmap 
+            digits[10][3];
     }
 }

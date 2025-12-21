@@ -35,6 +35,7 @@ InputHandler inputHandler;
 void setup() {
     TOASTER_LOG("\n\n\n\n\n\n%s %s\n", PROJECT_NAME, VERSION_NUMBER);
     TOASTER_LOG("Compiled %s\n", COMPILE_TIMESTAMP);
+    TOASTER_LOG("Bitmaps compiled %s\n", Bitmaps::BITMAP_GENERATION_TIMESTAMP);
     TOASTER_LOG("%s%s\n\n", LINK_1, LINK_2);
 
     EEPROM.begin(SETTING_COUNT + 4);    // Settings checksum is stored at address `SETTING_COUNT`

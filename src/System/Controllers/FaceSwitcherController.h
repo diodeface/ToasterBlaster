@@ -77,7 +77,7 @@ class FaceSwitcherController : public Controller {
         , joystickCentered(true)
         , sequences{f0, f1, f2, f3, f4, f5, f6, f7} {
         initHUD();
-        TOASTER_LOG("FaceSwitcherController initialized with faces: %s, %s, %s, %s\n", f0->name, f1->name, f2->name, f3->name);
+        TOASTER_LOG("FaceSwitcherController initialized with faces: %s, %s, %s, %s, %s, %s, %s, %s\n", f0->name, f1->name, f2->name, f3->name, f4->name, f5->name, f6->name, f7->name);
     }
 
     void handleRawInput(u8 x, u8 y) override {

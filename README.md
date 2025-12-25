@@ -107,8 +107,8 @@ Use an **external** 5V power supply<br><br>
 ## Bluetooth gamepad setup
 - [config.h](src/config.h) contains configuration constants including gamepad selection.
 - Uncomment your gamepad of choice. Only one type of gamepad can be enabled at a time. After making changes, reupload to your microcontroller.
-- To connect MOCUTE 052f gamepad, hold B and power button, the gamepad should turn on with a flashing LED. Flip the KEY/GAME switch to GAME position. Power up your microcontroller and check the heads up display, the gamepad name being displayed next to BT means the gamepad is connected successfully.
-- To connect Xbox Wireless gamepad, turn it on by holding down xbox button, until it starts blinking. Enable pairing mode by hold the sync button for two seconds. The blinking should now be faster. Power up your microcontroller and check the heads up display, the gamepad name being displayed next to BT means the gamepad is connected successfully.
+- To connect MOCUTE 052f gamepad, hold B and power button. The gamepad should turn on with a flashing LED. Flip the KEY/GAME switch to GAME position. Power up your microcontroller and check the heads up display, the gamepad name being displayed next to BT means the gamepad is connected successfully.
+- To connect Xbox Wireless gamepad, turn it on by holding down the xbox button until it starts blinking. Enable pairing mode by the holding sync button for two seconds. The blinking should now be faster. Power up your microcontroller and check the heads up display, the gamepad name being displayed next to BT means the gamepad is connected successfully.
 - If you face connection issues, try erasing flash as described in software setup.
 
 ## Gamepad button mapping
@@ -121,9 +121,10 @@ Use an **external** 5V power supply<br><br>
 | Blink eye (hold) | RB | Trigger (OK) |
 | Calibrate boop sensor | View (Select) | A |
 
-- This configuration is meant to be used with right hand only. For information on remapping buttons, read [gamepad-button-mapping.md](docs/gamepad-button-mapping.md).
+- This configuration is meant to be used with right hand only. Read [gamepad-button-mapping.md](docs/gamepad-button-mapping.md) for information about remapping buttons.
 
-## Controls: Settings (Controller_Settings)
+## Controls
+### Settings (Controller_Settings)
 The default screen displays brief information. Press up or down on the joystick to navigate through settings.
 <p float="left">
     <img src="docs/images/controls/0.jpg" width="200" />
@@ -135,7 +136,7 @@ When a setting is displayed, move the joystick left or right to change the value
     <img src="docs/images/controls/2.jpg" width="200" />
 </p>
 
-## Controls: Face switcher (Controller_FaceSwitcher)
+### Face switcher (Controller_FaceSwitcher)
 Selectable faces are displayed in a grid of 8. Moving the joystick selects a face pointing in that direction. Releasing the joystick transitions to the selected face. The name of the currently selected face is displayed in the top right corner.
 <p float="left">
     <img src="docs/images/controls/3.jpg" width="200" />
@@ -143,7 +144,7 @@ Selectable faces are displayed in a grid of 8. Moving the joystick selects a fac
     <img src="docs/images/controls/5.jpg" width="200" />
 </p>
 
-## Controls: Automatic face switcher (Controller_AutomaticFaceSwitcher)
+### Automatic face switcher (Controller_AutomaticFaceSwitcher)
 Automatically transitions to displayed face after the timer runs out. This process runs indefinitely. Move joystick in any direction to skip the timer. Skip the face by pressing the automatic face switcher button.
 <p float="left">
     <img src="docs/images/controls/6.jpg" width="200" />
@@ -173,7 +174,7 @@ Automatically transitions to displayed face after the timer runs out. This proce
 
 ## (todo) Custom animations
 - [Sequences.h](src/Assets/Sequences/Standard.h), [Sequences.cpp](src/Assets/Sequences/Standard.cpp) store animation sequences. Read the included [README](src/Assets/Sequences/README.txt) file.
-- [Transitions.h](src/Assets/Transitions/Standard.h), [Transitions.cpp](src/Assets/Transitions/Standard.cpp), [Overlays.h](src/Assets/Overlays/Standard.h), [Overlays.cpp](src/Animation/Overlay/Standard.cpp) for overlay sequences and transitions.
+- [Transitions.h](src/Assets/Transitions/Standard.h), [Transitions.cpp](src/Assets/Transitions/Standard.cpp), [Overlays.h](src/Assets/Overlays/Standard.h), [Overlays.cpp](src/Assets/Overlays/Standard.cpp) for overlay sequences and transitions.
 <br><br>
 
 # (todo) Contributing

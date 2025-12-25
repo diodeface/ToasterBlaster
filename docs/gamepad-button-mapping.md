@@ -1,6 +1,6 @@
 # Gamepad button mapping
-- Button mapping can be changed in the `createButtonMapping()` function in [main.cpp](src/main.cpp).
-- The program maps gamepad inputs onto [virtual buttons](src/System/Peripherals/Gamepad/Button.h) according to these tables:
+- Button mapping can be changed in the `createButtonMapping()` function in [main.cpp](../src/main.cpp).
+- The program maps gamepad inputs onto [virtual buttons](../src/System/Peripherals/Gamepad/Button.h) according to these tables:
 
 #### Xbox Wireless Gamepad
 

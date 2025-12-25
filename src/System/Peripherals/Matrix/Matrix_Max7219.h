@@ -10,7 +10,7 @@
 /**
  * Basic Max7219 display driver.
  */
-class Max7219 : public Matrix {
+class Matrix_Max7219 : public Matrix {
   private:
     u8 DIN, CS, CLK;
 
@@ -37,7 +37,7 @@ class Max7219 : public Matrix {
     }
 
   public:
-    Max7219(
+    Matrix_Max7219(
         u8 DIN, 
         u8 CS, 
         u8 CLK, 

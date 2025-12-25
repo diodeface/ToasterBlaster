@@ -16,7 +16,7 @@
  *
  * Draws a startup screen before running a callback.
  */
-class StartupController : public Controller {
+class Controller_Startup : public Controller {
   private:
     DisplayManager* displayManager;
     std::function<void()> finishFunction;
@@ -76,7 +76,7 @@ class StartupController : public Controller {
     }
 
   public:
-    StartupController(DisplayManager* displayManager, Timestamp period, std::function<void()> finishFunction)
+    Controller_Startup(DisplayManager* displayManager, Timestamp period, std::function<void()> finishFunction)
         : Controller(CONTROLLER_DEFAULT, SP_NONE)
         , displayManager(displayManager)
         , finishFunction(finishFunction)

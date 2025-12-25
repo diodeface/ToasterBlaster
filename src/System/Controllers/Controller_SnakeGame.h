@@ -17,7 +17,7 @@ enum SnakeGameState {
     SNAKE_PLAY
 };
 
-class SnakeGameController : public Controller {
+class Controller_SnakeGame : public Controller {
   private:
     DisplayManager* displayManager;
     u16 score, maxSnakeSize;
@@ -186,7 +186,7 @@ class SnakeGameController : public Controller {
     }
 
   public:
-    SnakeGameController(
+    Controller_SnakeGame(
         DisplayManager* displayManager,
         DisplayBitmask gameDisplayBitmask = MOUTH,
         DisplayBitmask scoreDisplayBitmask = EYES,
@@ -217,9 +217,9 @@ class SnakeGameController : public Controller {
 
     void handleInput(u8 x, u8 y) override {
         if(y == 0x00 && lastDirection != DOWN) direction = UP;
-        else if(x == 0xFF && lastDirection != RIGHT) direction = LEFT;
+        else if(x == 0x00 && lastDirection != RIGHT) direction = LEFT;
         else if(y == 0xFF && lastDirection != UP) direction = DOWN;
-        else if(x == 0x00 && lastDirection != LEFT) direction = RIGHT;
+        else if(x == 0xFF && lastDirection != LEFT) direction = RIGHT;
     }
 
     void update() override {

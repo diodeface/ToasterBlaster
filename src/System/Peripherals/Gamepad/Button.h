@@ -6,30 +6,34 @@ enum Button {
     BTN_NONE,
 
     BTN_UP,
-    BTN_DOWN,
-    BTN_LEFT,
+    BTN_UP_RIGHT,
     BTN_RIGHT,
+    BTN_DOWN_RIGHT,
+    BTN_DOWN,
+    BTN_DOWN_LEFT,
+    BTN_LEFT,
+    BTN_UP_LEFT,
+
     BTN_SELECT,
     BTN_START,
+    BTN_HOME,
+    BTN_SHARE,
+
     BTN_X,
     BTN_A,
     BTN_Y,
     BTN_B,
-    BTN_TRIG1,
-    BTN_TRIG2,
-    
-    BTN_ALT_UP,
-    BTN_ALT_DOWN,
-    BTN_ALT_LEFT,
-    BTN_ALT_RIGHT,
-    BTN_ALT_SELECT,
-    BTN_ALT_START,
-    BTN_ALT_X,
-    BTN_ALT_A,
-    BTN_ALT_Y,
-    BTN_ALT_B,
-    BTN_ALT_TRIG1,
-    BTN_ALT_TRIG2
+
+    BTN_L1,
+    BTN_R1,
+    BTN_L2,
+    BTN_R2,
+    BTN_L3,
+    BTN_R3,
+    BTN_L4,
+    BTN_R4,
+    BTN_L5,
+    BTN_R5
 };
 
 static const u8 BTN_STATE_PRESSED = 255;

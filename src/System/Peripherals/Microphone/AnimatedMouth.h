@@ -38,7 +38,7 @@ class AnimatedMouth : public ToasterComponent {
     Effect *mouthEffect, *mouthEffectReverse;
 
     void calibrate() {
-        // todo: rewrite this thing to do calibration without interrupting the program like in AnalogBoopSensor
+        // todo: rewrite this thing to do calibration without interrupting the program like in AnalogSensor_Boop
         std::fill(barHeights, barHeights + 32, 0);
 
         baseline = 0;

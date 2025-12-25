@@ -12,7 +12,7 @@
 #include "BoopSensor.h"
 #include "AnalogSensor.h"
 
-class AnalogBoopSensor : public AnalogSensor {
+class AnalogSensor_Boop : public AnalogSensor {
   private:
     BoopSensor* boopSensor;
 
@@ -42,7 +42,7 @@ class AnalogBoopSensor : public AnalogSensor {
     }
 
   public:
-    AnalogBoopSensor(
+    AnalogSensor_Boop(
         DisplayManager* displayManager, 
         OverlayPlayer* overlay, 
         OverlaySequence* enableOverlay,

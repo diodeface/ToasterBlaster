@@ -8,8 +8,16 @@
  * Configuration constants for used for setup.
  */
 
+ 
 // Bluetooth Gamepad selection
-#define GAMEPAD_MOCUTE052F_NIMBLE       // default "mocute" gamepad
+// To avoid connection issues, erase flash before changing gamepad type
+// (PlatformIO menu -> Project Tasks -> esp32dev -> Platform -> Erase flash)
+// If for any reason your bluetooth gamepad name does not match, you can change it in System/Peripherals/Gamepad/InputConfig_xxx
+
+#define GAMEPAD_MOCUTE052F       // mocute 052f gamepad
+//#define GAMEPAD_XBOX             // Xbox Wireless gamepad
+//#define GAMEPAD_DEBUG            // debug gamepad that prints out HID data
+
 
 namespace Config {
     // Pin numbers for components
@@ -64,11 +72,6 @@ namespace Config {
         LEFT_SIDE = EYE_L | NOSE_L | MOUTH_L,
         RIGHT_SIDE = EYE_R | NOSE_R | MOUTH_R,
         ALL = EYE_L | EYE_R | NOSE_L | NOSE_R | MOUTH_L | MOUTH_R;
-    }
-
-    namespace Bluetooth {
-        // Bluetooth gamepad name
-        static const char* DEVICE_NAME = "MOCUTE-052Fe-AUTO";
     }
 
     // Miscellaneous settings, best to leave these as is

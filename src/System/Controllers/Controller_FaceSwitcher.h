@@ -12,7 +12,7 @@ using namespace Config::Displays;
  *
  * Maps 4 face sequences to 4 joystick buttons.
  */
-class FaceSwitcherController : public Controller {
+class Controller_FaceSwitcher : public Controller {
   private:
     Sequence* sequences[8];
     DisplayManager* displayManager;
@@ -63,7 +63,7 @@ class FaceSwitcherController : public Controller {
     }
 
   public:
-    FaceSwitcherController(
+    Controller_FaceSwitcher(
         DisplayManager* displayManager, SequencePlayer* sequencePlayer, Sequence* f0, Sequence* f1, Sequence* f2,
         Sequence* f3, Sequence* f4, Sequence* f5, Sequence* f6, Sequence* f7
     )
@@ -77,14 +77,14 @@ class FaceSwitcherController : public Controller {
         , joystickCentered(true)
         , sequences{f0, f1, f2, f3, f4, f5, f6, f7} {
         initHUD();
-        TOASTER_LOG("FaceSwitcherController initialized with faces: %s, %s, %s, %s, %s, %s, %s, %s\n", f0->name, f1->name, f2->name, f3->name, f4->name, f5->name, f6->name, f7->name);
+        TOASTER_LOG("Controller_FaceSwitcher initialized with faces: %s, %s, %s, %s, %s, %s, %s, %s\n", f0->name, f1->name, f2->name, f3->name, f4->name, f5->name, f6->name, f7->name);
     }
 
     void handleRawInput(u8 x, u8 y) override {
-        u8 lineX = map(x, 0, 255, 128, 0);
+        u8 lineX = map(x, 0, 255, 0, 128);
         u8 lineY = map(y, 0, 255, 16, 64);
 
-        int16_t dx = (int16_t)x - 128;
+        int16_t dx = 128 - (int16_t)x;
         int16_t dy = 128 - (int16_t)y;
         
         if(abs(dx) < 64 && abs(dy) < 64) {
@@ -96,12 +96,12 @@ class FaceSwitcherController : public Controller {
 
         joystickCentered = false;
 
-        float angle_rad = atan2(dy, dx);
-        float angle_deg = angle_rad * (180.0 / M_PI);
+        float angleRad = atan2(dy, dx);
+        float angleDeg = angleRad * (180.0 / M_PI);
 
-        if (angle_deg < 0) angle_deg += 360.0;
+        if (angleDeg < 0) angleDeg += 360.0;
 
-        uint8_t octant = (uint8_t)((angle_deg + 22.5) / 45.0) % 8;
+        uint8_t octant = (uint8_t)((angleDeg + 22.5) / 45.0) % 8;
 
         u8 prevDrawColor = displayManager->hud->getDrawColor();
         displayManager->hud->setDrawColor(2);

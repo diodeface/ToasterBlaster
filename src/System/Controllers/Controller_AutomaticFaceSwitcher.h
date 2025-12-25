@@ -12,7 +12,7 @@ using namespace Config::Displays;
  * Switches randomly from a set of faces with a time interval
  */
 
-class AutomaticFaceSwitcherController : public Controller {
+class Controller_AutomaticFaceSwitcher : public Controller {
   private:
     DisplayManager* displayManager;
     SequencePlayer* sequencePlayer;
@@ -59,7 +59,7 @@ class AutomaticFaceSwitcherController : public Controller {
     }
 
   public:
-    AutomaticFaceSwitcherController(
+    Controller_AutomaticFaceSwitcher(
         DisplayManager* displayManager, 
         SequencePlayer* sequencePlayer,
         Timestamp minWait,

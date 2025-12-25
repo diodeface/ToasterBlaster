@@ -33,7 +33,7 @@
 
 using namespace Config::Displays;
 
-class SpectrumAnalyzerController : public Controller {
+class Controller_SpectrumAnalyzer : public Controller {
   private:
     DisplayManager* displayManager;
 
@@ -49,7 +49,7 @@ class SpectrumAnalyzerController : public Controller {
     arduinoFFT FFT = arduinoFFT(vReal, vImag, SAMPLES, SAMPLING_FREQ);
 
   public:
-    SpectrumAnalyzerController(DisplayManager* displayManager)
+    Controller_SpectrumAnalyzer(DisplayManager* displayManager)
         : Controller(CONTROLLER_SPECTRUM_ANALYZER, SP_STOP)
         , displayManager(displayManager) {
         displayManager->hud->drawStatusText("Analyzer");

@@ -14,6 +14,7 @@ except ImportError:
 
 import os
 import re
+import json
 from datetime import datetime
 from math import floor
 
@@ -72,11 +73,19 @@ if not (os.path.exists(bitmaps_source_location) and os.path.exists(bitmaps_heade
     print(f"Found {len(namespaces)} namespaces: {', '.join(namespaces)}")
 
     result = {n : [] for n in namespaces}
+    metadata = {}
 
     # main code generator loop
     for root, dirs, files in os.walk(bitmaps_dir):
         namespace = os.path.basename(root)
         for file in files:
+            file_extension = os.path.splitext(file)[1]
+            if file == "metadata.json":
+                # load metadata
+                with open(os.path.join(root, file)) as metadata_file:
+                    metadata[namespace] = json.load(metadata_file)
+                continue
+
             if os.path.splitext(file)[1] not in bitmap_file_types:
                 continue
 
@@ -101,6 +110,13 @@ if not (os.path.exists(bitmaps_source_location) and os.path.exists(bitmaps_heade
     for namespace in result:
         result[namespace].sort(key = lambda x: x.name)
     result = dict(sorted(result.items()))
+
+    # parse metadata
+    print("Parsing metadata...")
+    for namespace in metadata.keys():
+        metadata[namespace]["randomizerExceptions"] = list(map(lambda filename: str_to_identifier("".join(filename.split(".")[:-1])), metadata[namespace]["randomizerExceptions"]))
+
+    print("Generating bitmap code...")
 
     # generate and save header file
     out = f"""#pragma once
@@ -146,7 +162,7 @@ namespace Bitmaps {{
 
     for namespace in result:
         out += f"    std::vector<Bitmap*> {namespace}Bitmaps {{\n"
-        out += ",\n".join(f"        {namespace}::{bitmap.name}" for bitmap in result[namespace])
+        out += ",\n".join(f"        {namespace}::{bitmap.name}" for bitmap in filter(lambda bitmap: bitmap.name not in metadata[namespace]["randomizerExceptions"], result[namespace]))
         out += "\n    };\n\n"
 
     out += "}"
@@ -156,5 +172,5 @@ namespace Bitmaps {{
 
     print("Finished bitmap code generation.")
 
-
-print("No changes in bitmaps, skipping bitmap code generation.")
+else:
+    print("No changes in bitmaps, skipping bitmap code generation.")

@@ -4,13 +4,13 @@
 #include "Typedefs.h"
 #include "Setting.h"
 
-class LambdaSetting : public Setting {
+class Setting_Lambda : public Setting {
     
     std::function<u8()> getFunction;
     std::function<void(u8)> setFunction;
 
   public:
-    LambdaSetting(
+    Setting_Lambda(
         const char* name, 
         const char* description, 
         SettingKey key, 

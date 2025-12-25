@@ -25,12 +25,11 @@ AnimatedMouth* animatedMouth;
 SettingsManager* settingsManager;
 HeadsUpDisplay* hud;
 TweenManager* displayTweenManager;
-AnalogBoopSensor* boopSensor;
+AnalogSensor_Boop* boopSensor;
 EyeBlink* eyeBlink;
 LEDStrip* ledStrip;
 UptimeCounter* uptimeCounter;
 PWMFan* fanControl;
-InputHandler inputHandler;
 
 void setup() {
     TOASTER_LOG("\n\n\n\n\n\n%s %s\n", PROJECT_NAME, VERSION_NUMBER);
@@ -41,7 +40,7 @@ void setup() {
     EEPROM.begin(SETTING_COUNT + 4);    // Settings checksum is stored at address `SETTING_COUNT`
 
     hud = new U8G2HUDWrapper(Config::Pins::HUD_SCL, Config::Pins::HUD_SDA);
-    matrix = new Max7219(Config::Pins::MATRIX_DIN, Config::Pins::MATRIX_CS, Config::Pins::MATRIX_CLK, SettingsManager::getSavedValue(SETTING_MATRIX_BRIGHTNESS));
+    matrix = new Matrix_Max7219(Config::Pins::MATRIX_DIN, Config::Pins::MATRIX_CS, Config::Pins::MATRIX_CLK, SettingsManager::getSavedValue(SETTING_MATRIX_BRIGHTNESS));
     matrix->clear();
     displayManager = new DisplayManager(matrix, hud, SettingsManager::getSavedValue(SETTING_ENABLE_MATRIX));
     displayTweenManager = new TweenManager([](){displayManager->requestRedraw();});
@@ -61,33 +60,39 @@ void setup() {
     // To add persistent rotation or other effects to your displays, add a global effect:
     //displayManager->addGlobalEffect(new Rotate180(ALL));
 
+    // initialize led strip
     //ledStrip = new LEDStrip(SettingsManager::getSavedValue(SETTING_ENABLE_LEDSTRIP));     // spinning color LED strip animation
-    ledStrip = new LEDStripCD(SettingsManager::getSavedValue(SETTING_ENABLE_LEDSTRIP));     // optical disc LED strip animation
+    ledStrip = new LEDStrip_CD(SettingsManager::getSavedValue(SETTING_ENABLE_LEDSTRIP));     // optical disc LED strip animation
 
+    // initialize bluetooth gamepad
     #ifdef BT_GAMEPAD
     Gamepad::init();
     createButtonMapping();
     #endif
 
+    // initialize eye blink animation
     eyeBlink = new EyeBlink(
-        displayManager,
-        &Overlays::EyeBlink::closing,
-        &Overlays::EyeBlink::closed,
-        &Overlays::EyeBlink::opening,
-        5 SECONDS,
-        20 SECONDS,
-        40 MILLIS,
-        200 MILLIS,
-        SettingsManager::getSavedValue(SETTING_ENABLE_AUTO_BLINK)
+        displayManager,                     // displayManager instance
+        &Overlays::EyeBlink::closing,       // closing overlay
+        &Overlays::EyeBlink::closed,        // closed overlay
+        &Overlays::EyeBlink::opening,       // opening overlay
+        5 SECONDS,                          // minimum delay between auto blinks
+        20 SECONDS,                         // maximum delay between auto blinks
+        40 MILLIS,                          // minimum closed eyes duration
+        200 MILLIS,                         // maximum closed eyes duration
+        SettingsManager::getSavedValue(SETTING_ENABLE_AUTO_BLINK)       // enabled
     );
 
+    // initialize sequencePlayer with startup sequence
     sequencePlayer = new SequencePlayer(displayManager, displayTweenManager, eyeBlink, &Sequences::startup, SettingsManager::getSavedValue(SETTING_RARE_TRANSITION_CHANCE), true);
     
+    // set up common sequence transitions
     sequencePlayer->addCommonTransitions({
         &Transitions::blink,
         //&Transitions::crossfade
     });
 
+    // set up rare sequence transitions
     sequencePlayer->addRareTransitions({
         &Transitions::drop,
         &Transitions::slide,
@@ -103,20 +108,21 @@ void setup() {
         //&Transitions::modem
     });
 
+    // initialize other components
     animatedMouth = new AnimatedMouth(displayManager, 33 MILLIS, 500, 500, SettingsManager::getSavedValue(SETTING_ENABLE_ANIMATED_MOUTH));
 
     /*
-    boopSensor = new DigitalBoopSensor(
+    boopSensor = new DigitalSensor_Boop(
         displayManager, new OverlayPlayer(displayManager, &Overlays::boop, false, false), &Overlays::boop,
         &Transitions::glitch, PIN_BOOP_DIGITAL, BOOP_ACTIVATION_THRESHOLD, BOOP_ACTIVATION_MAX,
         EEPROM.read(EEPROM_BOOP_SENSOR)
     );
     */
 
-    boopSensor = new AnalogBoopSensor(
+    boopSensor = new AnalogSensor_Boop(
         displayManager, new OverlayPlayer(displayManager, &Overlays::Boop::boop, false, false), 
-        &Overlays::Boop::boop,  // enable overlay
-        &Transitions::glitch,   // disable overlay
+        &Overlays::Boop::boop,  // boop overlay
+        &Transitions::glitch,   // end boop overlay
         Config::Pins::BOOP_ANALOG, Config::BOOP_TRIGGER_COUNT, Config::BOOP_TRIGGERS_MAX, 
         ((f32)SettingsManager::getSavedValue(SETTING_BOOP_TRIGGER_MULTIPLIER)) / 255.0f,  // trigger multiplier
         200,   // calibration readings
@@ -130,10 +136,12 @@ void setup() {
 
     settingsManager = new SettingsManager();
     createSettingsMenu();
-    if(!settingsManager->init()) ESP.restart();
+    if(!settingsManager->init()) ESP.restart(); // restart microcontroller if settings checksum is invalid, settings have been reset
 
-    controller = new StartupController(displayManager, 3 SECONDS, [](){changeController(new SettingsController(displayManager, settingsManager));});
+    // initialize default controller
+    controller = new Controller_Startup(displayManager, 3 SECONDS, [](){changeController(new Controller_Settings(displayManager, settingsManager));});
 
+    // create heads up display update task on other core
     xTaskCreatePinnedToCore(loopAsync, "loopAsync", 2048, NULL, 1, &asyncLoopTask, 0);
 }
 
@@ -145,9 +153,8 @@ void loop(){
     lastTime = micros();
 
     #ifdef BT_GAMEPAD
-    Gamepad::update();
+    Gamepad::update(safeMode);  // safeMode is a function that gets called when the gamepad disconnects
     #endif
-    inputHandler.update();
     sequencePlayer->update();
     controller->update();
     displayTweenManager->update();
@@ -178,41 +185,89 @@ void changeController(Controller* newController) {
 
 #ifdef BT_GAMEPAD
 void createButtonMapping() {
-    inputHandler.mapButtonsToJoystick(BTN_UP, BTN_DOWN, BTN_LEFT, BTN_RIGHT, handleJoystickInput);
-    inputHandler.mapButtonsToJoystick(BTN_ALT_UP, BTN_ALT_DOWN, BTN_ALT_LEFT, BTN_ALT_RIGHT, handleJoystickInput);
-    inputHandler.mapButtonsToJoystick(BTN_ALT_X, BTN_ALT_B, BTN_ALT_A, BTN_ALT_Y, handleJoystickInput);
+    // joystick in GAME mode or left analog, mapped to controller action
+    Gamepad::inputHandler.mapJoystick(
+        0,                                                      // joystick id
+        [](u8 x, u8 y){controller->handleInput(x, y);},         // filtered input
+        [](u8 x, u8 y){controller->handleRawInput(x, y);}       // raw input
+    );
 
-    inputHandler.mapButtons({
-        {BTN_TRIG1, BTN_STATE_PRESSED, [](){ 
+    // joystick in KEY mode or right analog, mapped to controller action
+    Gamepad::inputHandler.mapJoystick(
+        1,                                                      // joystick id
+        [](u8 x, u8 y){controller->handleInput(x, y);},         // filtered input
+        [](u8 x, u8 y){controller->handleRawInput(x, y);}       // raw input
+    );
+
+    // joystick in KEY (dpad) mode or directional pad, mapped to joystick 0
+    Gamepad::inputHandler.mapButtonsToJoystick(0, BTN_UP, BTN_UP_RIGHT, BTN_RIGHT, BTN_DOWN_RIGHT, BTN_DOWN, BTN_DOWN_LEFT, BTN_LEFT, BTN_UP_LEFT);
+
+    // change button mapping depending on gamepad so that it makes more sense
+    #ifdef GAMEPAD_DEBUG
+        const Button 
+            BTN_FACESET1 =              BTN_NONE,
+            BTN_FACESET2 =              BTN_NONE,
+            BTN_FACESET3 =              BTN_NONE,
+            BTN_SETTINGS =              BTN_NONE,
+            BTN_BLINK =                 BTN_NONE,
+            BTN_CALIBRATE_BOOP =        BTN_NONE,
+            BTN_AUTO_FACE_SWITCHER =    BTN_NONE;
+    #endif
+    #ifdef GAMEPAD_XBOX
+        const Button 
+            BTN_FACESET1 =              BTN_Y,
+            BTN_FACESET2 =              BTN_X,
+            BTN_FACESET3 =              BTN_B,
+            BTN_SETTINGS =              BTN_A,
+            BTN_BLINK =                 BTN_R1,
+            BTN_CALIBRATE_BOOP =        BTN_SELECT,
+            BTN_AUTO_FACE_SWITCHER =    BTN_START;
+    #endif
+    #ifdef GAMEPAD_MOCUTE052F
+        const Button 
+            BTN_FACESET1 =              BTN_X,
+            BTN_FACESET2 =              BTN_SELECT,
+            BTN_FACESET3 =              BTN_START,
+            BTN_SETTINGS =              BTN_B,
+            BTN_BLINK =                 BTN_R1,
+            BTN_CALIBRATE_BOOP =        BTN_A,
+            BTN_AUTO_FACE_SWITCHER =    BTN_Y;
+    #endif
+
+    // general button mapping
+    Gamepad::inputHandler.mapButtons({
+        // right bumper for eye blink
+        {BTN_BLINK, BTN_STATE_PRESSED, [](){ 
             eyeBlink->handleInput(true); 
         }},
-
-        {BTN_TRIG1, BTN_STATE_RELEASED, [](){ 
+        {BTN_BLINK, BTN_STATE_RELEASED, [](){ 
             eyeBlink->handleInput(false); 
         }},
 
-        {BTN_X, BTN_STATE_PRESSED, [](){
-            changeController( new FaceSwitcherController( displayManager, sequencePlayer, &Sequences::joyBlush, &Sequences::spooked, &Sequences::neutral, &Sequences::blushing, &Sequences::joy, &Sequences::angry, &Sequences::angryHappy, &Sequences::annoyed ));
+        // change face sets
+        {BTN_FACESET1, BTN_STATE_PRESSED, [](){
+            changeController( new Controller_FaceSwitcher( displayManager, sequencePlayer, &Sequences::joyBlush, &Sequences::spooked, &Sequences::neutral, &Sequences::blushing, &Sequences::joy, &Sequences::angry, &Sequences::angryHappy, &Sequences::annoyed ));
         }},
-        
-        {BTN_SELECT, BTN_STATE_PRESSED, [](){ 
-            changeController( new FaceSwitcherController( displayManager, sequencePlayer, &Sequences::heartEyes, &Sequences::questioning, &Sequences::dizzy, &Sequences::exclamation, &Sequences::dead, &Sequences::squinting, &Sequences::powerOff, &Sequences::wink ));
+        {BTN_FACESET2, BTN_STATE_PRESSED, [](){ 
+            changeController( new Controller_FaceSwitcher( displayManager, sequencePlayer, &Sequences::heartEyes, &Sequences::questioning, &Sequences::dizzy, &Sequences::exclamation, &Sequences::dead, &Sequences::squinting, &Sequences::powerOff, &Sequences::wink ));
+        }},
+        {BTN_FACESET3, BTN_STATE_PRESSED, [](){ 
+            changeController( new Controller_FaceSwitcher( displayManager, sequencePlayer, &Sequences::crying, &Sequences::batteryCheck, &Sequences::uwu, &Sequences::randomize, &Sequences::nope, &Sequences::powerOff, &Sequences::owo, &Sequences::dizzy ));
         }},
 
-        {BTN_START, BTN_STATE_PRESSED, [](){ 
-            changeController( new FaceSwitcherController( displayManager, sequencePlayer, &Sequences::crying, &Sequences::batteryCheck, &Sequences::uwu, &Sequences::randomize, &Sequences::nope, &Sequences::powerOff, &Sequences::owo, &Sequences::dizzy ));
+        // settings
+        {BTN_SETTINGS, BTN_STATE_PRESSED, [](){ 
+            changeController(new Controller_Settings(displayManager, settingsManager)); 
         }},
 
-        {BTN_A, BTN_STATE_PRESSED, [](){ 
+        // calibrate boop sensor
+        {BTN_CALIBRATE_BOOP, BTN_STATE_PRESSED, [](){ 
             boopSensor->calibrate(); 
         }},
 
-        {BTN_B, BTN_STATE_PRESSED, [](){ 
-            changeController(new SettingsController(displayManager, settingsManager)); 
-        }},
-
-        {BTN_Y, BTN_STATE_PRESSED, [](){
-            changeController( new AutomaticFaceSwitcherController(
+        // automatic face switcher
+        {BTN_AUTO_FACE_SWITCHER, BTN_STATE_PRESSED, [](){
+            changeController( new Controller_AutomaticFaceSwitcher(
                 displayManager, sequencePlayer, 5 SECONDS, 20 SECONDS, {
                     &Sequences::neutral,
                     &Sequences::joy,
@@ -241,7 +296,7 @@ void createButtonMapping() {
 
 void createSettingsMenu() {
     settingsManager->addSettings({
-        new LambdaSetting(
+        new Setting_Lambda(
             "Matrix",       // category
             "Brightness",   // name
             SETTING_MATRIX_BRIGHTNESS,  // unique key defined in Settings/SettingKeys.h enum SettingKey
@@ -251,15 +306,15 @@ void createSettingsMenu() {
             [](u8 value) { displayManager->setMatrixBrightness(value); }        // setter using u8
         ),
 
-        new ComponentToggleSetting("Matrix", "Enable", SETTING_ENABLE_MATRIX, true, displayManager),        // category, name, unique key, default value, child of ToasterComponent
+        new Setting_ComponentToggle("Matrix", "Enable", SETTING_ENABLE_MATRIX, true, displayManager),        // category, name, unique key, default value, child of ToasterComponent
 
-        new ComponentToggleSetting("LED Strip", "Enable", SETTING_ENABLE_LEDSTRIP, true, ledStrip),
+        new Setting_ComponentToggle("LED Strip", "Enable", SETTING_ENABLE_LEDSTRIP, true, ledStrip),
 
-        new ComponentToggleSetting("Auto blink", "Enable", SETTING_ENABLE_AUTO_BLINK, true, eyeBlink),
+        new Setting_ComponentToggle("Auto blink", "Enable", SETTING_ENABLE_AUTO_BLINK, true, eyeBlink),
 
-        new ComponentToggleSetting("Boop sensor", "Enable", SETTING_ENABLE_BOOP_SENSOR, false, boopSensor),
+        new Setting_ComponentToggle("Boop sensor", "Enable", SETTING_ENABLE_BOOP_SENSOR, false, boopSensor),
 
-        new LambdaSetting(
+        new Setting_Lambda(
             "Boop sensor",
             "Sensitivity",
             SETTING_BOOP_TRIGGER_MULTIPLIER,
@@ -269,13 +324,13 @@ void createSettingsMenu() {
             [](u8 value) { boopSensor->setTriggerMultiplier(value); }
         ),
 
-        new ActionSetting("Boop sensor", "Calibrate", [](u8 value) { boopSensor->calibrate(); }),       // category, name, function to be called
+        new Setting_Action("Boop sensor", "Calibrate", [](u8 value) { boopSensor->calibrate(); }),       // category, name, function to be called
 
-        new ComponentToggleSetting("Mouth anim.", "Enable", SETTING_ENABLE_ANIMATED_MOUTH, false, animatedMouth),
+        new Setting_ComponentToggle("Mouth anim.", "Enable", SETTING_ENABLE_ANIMATED_MOUTH, false, animatedMouth),
 
-        new ActionSetting("Mouth anim.", "Calibrate", [](u8 value) { animatedMouth->reset(); }),
+        new Setting_Action("Mouth anim.", "Calibrate", [](u8 value) { animatedMouth->reset(); }),
 
-        new LambdaSetting(
+        new Setting_Lambda(
             "Rare transit.",
             "Chance",
             SETTING_RARE_TRANSITION_CHANCE,
@@ -285,7 +340,7 @@ void createSettingsMenu() {
             [](u8 value) { sequencePlayer->setRareTransitionChance(value); }
         ),
 
-        new LambdaSetting(
+        new Setting_Lambda(
             "Fan speed",
             "",
             SETTING_FAN_PWM_SPEED,
@@ -295,60 +350,37 @@ void createSettingsMenu() {
             [](u8 value) { fanControl->setSpeed(value); }
         ),
 
-        new ActionSetting(
+        new Setting_Action(
             "Misc.",
             "Snake game",
             [](u8 value) { 
                 animatedMouth->stop(); 
-                changeController(new SnakeGameController(displayManager, MOUTH, EYES, 200 MILLIS)); 
+                changeController(new Controller_SnakeGame(displayManager, MOUTH, EYES, 200 MILLIS)); 
             }
         ),
 
         /*
-        new ActionSetting(
+        new Setting_Action(
             "Misc.",
             "Analyzer",
             [](u8 value) { 
                 animatedMouth->stop(); 
-                changeController(new SpectrumAnalyzerController(displayManager)); 
+                changeController(new Controller_SpectrumAnalyzer(displayManager)); 
             }
         ),
         */
 
-        // new ActionSetting("Misc.", "Strobe test", [](u8 value) { changeController(new StrobeController(displayManager, sequencePlayer, displayTweenManager)); }),
+        // new Setting_Action("Misc.", "Strobe test", [](u8 value) { changeController(new Controller_Strobe(displayManager, sequencePlayer, displayTweenManager)); }),
 
-        new ActionSetting("System", "Restart", [](u8 value) { ESP.restart(); }),
+        new Setting_Action("System", "Restart", [](u8 value) { ESP.restart(); }),
 
-        new ActionSetting("System", "Save settings", [](u8 value) { settingsManager->saveSettings(); }),
+        new Setting_Action("System", "Save settings", [](u8 value) { settingsManager->saveSettings(); }),
     });
-}
-
-ButtonDebounce debounceX, debounceY;
-u8 prevX, prevY;
-// filters out raw joystick data and sends to the active controller
-void handleJoystickInput(u8 x, u8 y) {
-    // round and debounce
-    u8 rX = roundAnalogValue(x);
-    u8 rY = roundAnalogValue(y);
-
-    if (rX == 0x80) debounceX.reset();
-    else if (debounceX.shouldActivate()) controller->handleInput(rX, 0x80);
-
-    if (rY == 0x80) debounceY.reset();
-    else if (debounceY.shouldActivate()) controller->handleInput(0x80, rY);
-
-    // send raw joystick data to the active controller if needed
-    if (prevX != x || prevY != y) {
-        controller->handleRawInput(x, y);
-    }
-
-    prevX = x;
-    prevY = y;
 }
 
 void safeMode() {
     if (controller->getType() != CONTROLLER_SETTINGS) {
-        changeController(new SettingsController(displayManager, settingsManager));
+        changeController(new Controller_Settings(displayManager, settingsManager));
     }
     Sequence* s = sequencePlayer->getSequence();
     if (s != &Sequences::neutral && s != &Sequences::startup) {

@@ -3,9 +3,9 @@
 #include <Arduino.h>
 #include <vector>
 #include "Setting.h"
-#include "LambdaSetting.h"
-#include "ActionSetting.h"
-#include "ComponentToggleSetting.h"
+#include "Setting_Lambda.h"
+#include "Setting_Action.h"
+#include "Setting_ComponentToggle.h"
 #include "SettingKeys.h"
 
 class SettingsManager {

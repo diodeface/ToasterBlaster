@@ -14,9 +14,9 @@
  * LED Strip CD animation
  */
 
-class LEDStripCD : public LEDStrip {
+class LEDStrip_CD : public LEDStrip {
   public:
-    LEDStripCD(bool enabled = true) 
+    LEDStrip_CD(bool enabled = true) 
     : LEDStrip(enabled) {
         period = 16 MILLIS;
     }

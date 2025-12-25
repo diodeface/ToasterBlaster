@@ -1,10 +1,10 @@
-#include "System/Peripherals/Matrix/Max7219.h"
+#include "System/Peripherals/Matrix/Matrix_Max7219.h"
 #include "System/Peripherals/HUD/U8G2HUDWrapper.h"
 
 #include "System/Peripherals/Microphone/AnimatedMouth.h"
-#include "System/Peripherals/Sensors/AnalogBoopSensor.h"
+#include "System/Peripherals/Sensors/AnalogSensor_Boop.h"
 #include "System/Peripherals/LEDStrip/LEDStrip.h"
-#include "System/Peripherals/LEDStrip/LEDStripCD.h"
+#include "System/Peripherals/LEDStrip/LEDStrip_CD.h"
 #include "System/Peripherals/Gamepad/InputHandler.h"
 #include "System/Peripherals/PWMFan.h"
 #include "System/Peripherals/Gamepad/ButtonDebounce.h"

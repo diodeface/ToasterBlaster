@@ -4,11 +4,11 @@
 #include "Typedefs.h"
 #include "Setting.h"
 
-class ActionSetting : public Setting {
+class Setting_Action : public Setting {
     std::function<void(u8)> setFunction;
 
   public:
-    ActionSetting(
+    Setting_Action(
         const char* name, 
         const char* description, 
         std::function<void(i8)> setFunction

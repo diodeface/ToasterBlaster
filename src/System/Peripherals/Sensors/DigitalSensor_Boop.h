@@ -10,7 +10,7 @@
 #include "BoopSensor.h"
 #include "Sensor.h"
 
-class DigitalBoopSensor : public Sensor {
+class DigitalSensor_Boop : public Sensor {
   private:
     BoopSensor* boopSensor;
 
@@ -28,7 +28,7 @@ class DigitalBoopSensor : public Sensor {
     }
 
   public:
-    DigitalBoopSensor(
+    DigitalSensor_Boop(
         DisplayManager* displayManager, 
         OverlayPlayer* overlay, 
         OverlaySequence* enableOverlay,

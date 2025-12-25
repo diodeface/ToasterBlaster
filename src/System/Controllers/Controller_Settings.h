@@ -13,7 +13,7 @@
  *
  * Displays info and provides a simple way to change settings.
  */
-class SettingsController : public Controller {
+class Controller_Settings : public Controller {
   private:
     DisplayManager* displayManager;
     SettingsManager* settingsManager;
@@ -126,7 +126,7 @@ class SettingsController : public Controller {
     }
 
   public:
-    SettingsController(DisplayManager* displayManager, SettingsManager* settingsManager)
+    Controller_Settings(DisplayManager* displayManager, SettingsManager* settingsManager)
         : Controller(CONTROLLER_SETTINGS, SP_NONE)
         , displayManager(displayManager)
         , settingsManager(settingsManager) {
@@ -157,9 +157,9 @@ class SettingsController : public Controller {
             addSettingsCursor(-1);
         } else if(y == 0xFF) {
             addSettingsCursor(1);
-        } else if(x == 0xFF) {
-            adjustSettingValue(-1);
         } else if(x == 0x00) {
+            adjustSettingValue(-1);
+        } else if(x == 0xFF) {
             adjustSettingValue(1);
         }
     }

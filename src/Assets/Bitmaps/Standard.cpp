@@ -3,7 +3,7 @@
 // To modify, edit the original png files and build again.
 
 namespace Bitmaps {
-    const char* BITMAP_GENERATION_TIMESTAMP = "2025-12-21 15:04:32.259247";
+    const char* BITMAP_GENERATION_TIMESTAMP = "2025-12-25 18:05:25.748302";
 
     namespace Eye {
         Bitmap angry[16] { 0x00, 0x3c, 0x3f, 0x1f, 0x0f, 0x03, 0x01, 0x00, 0x00, 0x00, 0xe0, 0xfc, 0xfc, 0xf8, 0xe0, 0x00 };
@@ -57,18 +57,13 @@ namespace Bitmaps {
     std::vector<Bitmap*> EyeBitmaps {
         Eye::angry,
         Eye::annoyed,
-        Eye::batteryCheck,
         Eye::blushing,
         Eye::boop,
         Eye::crying0,
-        Eye::crying1,
         Eye::dead,
         Eye::dizzy0,
-        Eye::dizzy1,
         Eye::exclamationPoint,
         Eye::flushed,
-        Eye::heart0,
-        Eye::heart1,
         Eye::heart2,
         Eye::joy,
         Eye::joyBlush,
@@ -79,14 +74,10 @@ namespace Bitmaps {
     };
 
     std::vector<Bitmap*> MouthBitmaps {
-        Mouth::batteryCheck,
         Mouth::happy,
         Mouth::neutral,
-        Mouth::nope,
         Mouth::sad,
         Mouth::shaking0,
-        Mouth::shaking1,
-        Mouth::shaking2,
         Mouth::smile,
         Mouth::smileTongue,
         Mouth::smirk,
@@ -94,8 +85,7 @@ namespace Bitmaps {
     };
 
     std::vector<Bitmap*> NoseBitmaps {
-        Nose::neutral,
-        Nose::o
+        Nose::neutral
     };
 
     std::vector<Bitmap*> OtherBitmaps {

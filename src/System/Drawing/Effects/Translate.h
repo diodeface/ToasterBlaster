@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include "config.h"
 #include "System/Utilities/Util.h"
 #include "Typedefs.h"
 #include "Effect.h"
@@ -22,18 +23,57 @@ class Translate : public Effect {
         , y(y) {
     }
 
-    // todo: This could be faster if rewritten with bitwise operators and array shifts...
-    static void translate(u8* buffer, size_t size, i8 x, i8 y) {
-        if(x == 0 && y == 0) return;
+    static void translate(u8* buffer, i8 size, i8 x, i8 y) {
+        static i8 displayHeight = (i8)Config::DISPLAY_HEIGHT;
+        // return if no change
+        if (x == 0 && y == 0) return;
+
+        // return if out of bounds
+        if (y >= displayHeight || y <= -displayHeight || x >= size || x <= -size) {
+            std::fill(buffer, buffer + size, 0);
+            return;
+        }
+
+        // shift arrays every multiples of 8 on x axis + y
         u8 ret[size] = {0};
-        for(size_t i = 0; i < size; i++) {
-            for(size_t j = 0; j < 8; j++) {
-                i8 newX = i + x, newY = j + y;
-                if(newX > size - 1 || newY > 7) break;
-                if(newX < 0 || newY < 0) continue;
-                SetPixel::setPixel(ret, size, newX, newY, getPixel(buffer, size, i, j));
+        i8 yShift = (x / displayHeight) * displayHeight + y;
+
+        if (yShift > 0) {
+            for (i8 i = 0; i < size; i++) {
+                i8 target = yShift + i;
+                if(i % displayHeight + y >= displayHeight) continue;
+                ret[target] = buffer[i];
+            }
+        } else if (yShift < 0) {
+            for (i8 i = size - 1; i >= 0; i--) {
+                i8 target = yShift + i;
+                if(i % displayHeight + y < 0) continue;
+                ret[target] = buffer[i];
             }
         }
+        else {
+            std::copy(buffer, buffer + size, ret);
+        }
+
+        // bitwise shift for individual rows, bitwise OR with neighbors
+        i8 xShift = x % 8;
+        if (xShift != 0) {
+            i8 axShift = abs(xShift);
+            if (xShift > 0) {
+                for (i8 i = size - 1; i >= 0; i--) {
+                    ret[i] >>= axShift;
+                    if (i >= displayHeight) ret[i] |= ret[i-displayHeight] << (displayHeight - axShift);
+                }
+            }
+            else {
+                i8 lastColIdx = size - displayHeight;
+                for (i8 i = 0; i < size; i++) {
+                    ret[i] <<= axShift;
+                    if (i < lastColIdx) ret[i] |= ret[i+displayHeight] >> (displayHeight - axShift);
+                }
+            }
+        }
+
         std::copy(ret, ret + size, buffer);
     }
 

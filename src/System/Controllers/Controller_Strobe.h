@@ -10,7 +10,7 @@
 
 // todo: finish this
 // this is more or less a proof of concept
-class StrobeController : public Controller {
+class Controller_Strobe : public Controller {
   private:
     std::vector<Sequence*> selectedSequences;
     DisplayManager* displayManager;
@@ -19,14 +19,14 @@ class StrobeController : public Controller {
     u8 currentSequence;
     Timestamp time, strobeDuration;
 
-    enum StrobeControllerState {
+    enum Controller_StrobeState {
         STROBE_SELECT,
         STROBE_STOPPED,
         STROBE_SHOWING
     } state;
 
   public:
-    StrobeController(
+    Controller_Strobe(
         DisplayManager* displayManager, 
         SequencePlayer* sequencePlayer,
         TweenManager* tweenManager

@@ -4,12 +4,12 @@
 #include "Setting.h"
 #include "System/Components/ToasterComponent.h"
 
-class ComponentToggleSetting : public Setting {
+class Setting_ComponentToggle : public Setting {
   private:
     ToasterComponent* component;
 
   public:
-    ComponentToggleSetting(const char* name, const char* description,  SettingKey key, u8 defaultValue, ToasterComponent* component)
+    Setting_ComponentToggle(const char* name, const char* description,  SettingKey key, u8 defaultValue, ToasterComponent* component)
         : Setting(name, description, key, SETTING_TYPE_TOGGLE, defaultValue, 0, 1, 1)
         , component(component) 
     {}

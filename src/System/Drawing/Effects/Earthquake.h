@@ -23,8 +23,8 @@ class Earthquake : public Effect {
 
     void apply(u8* buffer, Display* display) override {
         Effect::apply(buffer, display);
-        i8 offsetX = random(-amplitudeX, amplitudeX);
-        i8 offsetY = random(-amplitudeX, amplitudeX);
+        i8 offsetX = random(-amplitudeX, amplitudeX + 1);
+        i8 offsetY = random(-amplitudeY, amplitudeY + 1);
         Translate::translate(display->hudBuffer, display->getSize(), offsetX, offsetY);
     }
 };

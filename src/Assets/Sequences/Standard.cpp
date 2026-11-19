@@ -303,34 +303,6 @@ namespace Sequences {
     };
     // ---------------------------------------
 
-    // TODO: eye dot moving around randomly
-    Sequence powerstickDefault {
-        {
-            {   
-                {mirrorLeft},
-                {
-                    {EYES, Eye::powerstick},
-                }
-            },
-        },
-        "Powerstick!",
-        &Transitions::blink
-    };
-
-    // TODO: earthquake and glitch effect, progressively getting stronger and stronger, sometimes fire particles front to back
-    Sequence powerstickVacuuming {
-        {
-            {   
-                {mirrorLeft},
-                {
-                    {EYES, Eye::boop},
-                }
-            },
-        },
-        "Vacuuming...",
-        &Transitions::blink
-    };
-
     // Display test --------------------------
     Sequence displayTest {
         {{{}, {{ALL, Other::full}}}},

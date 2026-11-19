@@ -40,11 +40,7 @@ namespace Sequences {
         // miscellaneous
         displayTest,
         none,
-        randomize,
-
-        // custom
-        powerstickDefault,
-        powerstickVacuuming;
+        randomize;
 
     extern std::vector<Sequence> sequences;
 }

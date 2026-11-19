@@ -28,7 +28,11 @@ EyeBlink* eyeBlink;
 
 VacuumCleanerButton* vacuumCleanerButton;
 
-void setup() {
+void setup() { 
+    #ifdef DEBUG
+    Serial.begin(115200);
+    Serial.setDebugOutput(true);
+    #endif
     TOASTER_LOG("\n\n\n\n\n\n%s %s\n", PROJECT_NAME, VERSION_NUMBER);
     TOASTER_LOG("Compiled %s\n", COMPILE_TIMESTAMP);
     TOASTER_LOG("Bitmaps compiled %s\n", Bitmaps::BITMAP_GENERATION_TIMESTAMP);

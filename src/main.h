@@ -8,6 +8,7 @@
 
 #include "Assets/System.h"
 #include "Assets/Standard.h"
+#include "Assets/Sequences/Powerstick.h"
 
 extern SettingsManager* settingsManager;
 extern SequencePlayer* sequencePlayer;

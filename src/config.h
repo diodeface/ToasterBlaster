@@ -14,7 +14,7 @@
 // (PlatformIO menu -> Project Tasks -> esp32dev -> Platform -> Erase flash)
 // If for any reason your bluetooth gamepad name does not match, you can change it in System/Peripherals/Gamepad/InputConfig_xxx
 
-#define GAMEPAD_MOCUTE052F       // mocute 052f gamepad
+//#define GAMEPAD_MOCUTE052F       // mocute 052f gamepad
 //#define GAMEPAD_XBOX             // Xbox Wireless gamepad
 //#define GAMEPAD_DEBUG            // debug gamepad that prints out HID data
 
@@ -26,9 +26,9 @@ namespace Config {
         // Built-in LED
         LED_BUILTIN = 2,
         // Main outer display
-        MATRIX_DIN = 23,
-        MATRIX_CS = 5,
-        MATRIX_CLK = 18,
+        MATRIX_DIN = 36,
+        MATRIX_CS = 33,
+        MATRIX_CLK = 34,
         // Infrared (boop) sensor
         BOOP_DIGITAL = 19,
         BOOP_ANALOG = 39,
@@ -43,15 +43,15 @@ namespace Config {
 
     namespace Displays {
         const u8 
-        NUM_DISPLAYS = 14;     // number of chained MAX7219 devices
+        NUM_DISPLAYS = 4;     // number of chained MAX7219 devices
         
         const u8 
-        POS_EYE_L =     96,    // eye left
+        POS_EYE_L =     16,    // eye left
         POS_EYE_R =     0,     // eye right
-        POS_MOUTH_L =   64,    // mouth left
-        POS_MOUTH_R =   16,    // mouth right
-        POS_NOSE_L =    56,    // nose left
-        POS_NOSE_R =    48;    // nose left
+        POS_MOUTH_L =   0,    // mouth left
+        POS_MOUTH_R =   0,    // mouth right
+        POS_NOSE_L =    0,    // nose left
+        POS_NOSE_R =    0;    // nose left
 
         // Display Bitmasks (identifier)
         // Leave these unless you want to add or remap displays

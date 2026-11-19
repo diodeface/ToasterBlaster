@@ -9,17 +9,17 @@
 #include "Arduino.h"
 
 #ifdef DEBUG
-#define TOASTER_LOG(s, ...) printf(s, ##__VA_ARGS__)
+#define TOASTER_LOG(s, ...) ets_printf(s, ##__VA_ARGS__)
 #else
 #define TOASTER_LOG
 #endif
 #ifdef BTDEBUG
-#define BT_LOG(s, ...) printf(s, ##__VA_ARGS__)
+#define BT_LOG(s, ...) ets_printf(s, ##__VA_ARGS__)
 #else
 #define BT_LOG
 #endif
 #ifdef MICDEBUG
-#define MIC_LOG(s, ...) printf(s, ##__VA_ARGS__)
+#define MIC_LOG(s, ...) ets_printf(s, ##__VA_ARGS__)
 #else
 #define MIC_LOG
 #endif

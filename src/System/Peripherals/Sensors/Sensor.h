@@ -20,6 +20,7 @@ class Sensor : public ToasterComponent {
     const u8 triggerCount;  // if the sensor is high for this amount of updates, the onEnable() function is called
     const u8 maxTriggers;   // trigger limit, needs to be higher than triggerCount, adds a small delay on sensor deactivation
     u8 triggers;            // number of triggers, amount goes up when high, down when low
+    bool onEnableTriggered;
 
     Timestamp time, period;
 
@@ -54,6 +55,7 @@ class Sensor : public ToasterComponent {
         triggers = 0;
         time = 0;
         period = 50000;
+        onEnableTriggered = false;
     }
 
     void start() override {
@@ -81,7 +83,7 @@ class Sensor : public ToasterComponent {
             if((time += deltaTime) < period) return;
             time = 0;
 
-            if(getReadout() != inverted) {
+            if (getReadout() != inverted) {
                 if(triggers > 0) {
                     onTriggerAmountChange(--triggers);
                 }
@@ -91,10 +93,12 @@ class Sensor : public ToasterComponent {
                 }
             }
 
-            if(triggers >= triggerCount) {
+            if (triggers >= triggerCount && !onEnableTriggered) {
                 onEnable();
-            } else {
+                onEnableTriggered = true;
+            } else if (triggers < triggerCount && onEnableTriggered) {  // onEnable kept being triggered every update, didn't notice that until now oopsie :3
                 onDisable();
+                onEnableTriggered = false;
             }
         }
         onUpdate();

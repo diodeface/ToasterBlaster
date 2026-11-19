@@ -30,6 +30,7 @@ namespace Bitmaps {
             joyBlush[16],
             neutral[16],
             o[16],
+            powerstick[16],
             questionMark[16],
             u[16];
     }

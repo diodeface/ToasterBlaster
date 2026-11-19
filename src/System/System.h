@@ -12,3 +12,5 @@
 #include "System/Peripherals.h"
 #include "System/Components/UptimeCounter.h"
 #include "System/Settings/SettingsManager.h"
+
+#include "System/Peripherals/Sensors/VacuumCleanerButton.h"

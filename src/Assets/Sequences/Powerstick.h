@@ -8,7 +8,10 @@
 namespace Sequences {
     extern Sequence 
         powerstickDefault,
-        powerstickError,
-        powerstickStartVacuuming,
-        powerstickEndVacuuming;
+        powerstickVacuumFail,
+        powerstickVacuumStart,
+        powerstickVacuumEnd1000,
+        powerstickVacuumEnd1500,
+        powerstickVacuumEnd2000,
+        powerstickVacuumEnd4000;
 }

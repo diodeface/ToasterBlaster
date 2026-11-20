@@ -16,7 +16,8 @@ namespace Sequences {
     Earthquake* psEarthquakeEyes = new Earthquake(EYES, 0, 0);
     Expand* psExpandEyes = new Expand(EYES, 0);
 
-    // TODO: eye dot moving around randomly
+    // TODO: redo vacuum end and fail sequences as overlays
+    // TODO: eye dot moving around randomly, sleep animation after 5 minutes
     Sequence powerstickDefault {
         {
             {   
@@ -27,7 +28,7 @@ namespace Sequences {
         &Transitions::glitch
     };
 
-    Sequence powerstickStartVacuuming {
+    Sequence powerstickVacuumStart {
         {
             {
                 { mirrorLeft, psTranslateEyes, new Tween<i8>(&(psTranslateEyes->x), 0, -4, 220 MILLIS, TWEEN_OUT),},
@@ -47,34 +48,115 @@ namespace Sequences {
             },
             {
                 {   
-                    mirrorLeft, psEarthquakeEyes, psGlitchEyes,
+                    mirrorLeft, psEarthquakeEyes,
                     new Tween<u8>(&(psEarthquakeEyes->amplitudeX), 0, 2, 1000 MILLIS, TWEEN_LINEAR), 
                     new Tween<u8>(&(psEarthquakeEyes->amplitudeY), 0, 1, 2500 MILLIS, TWEEN_IN),               
                 },
                 {{EYES, Eye::boop}}, 2500 MILLIS,
             },
             {
-                { mirrorLeft, psEarthquakeEyes, psGlitchEyes },
+                { mirrorLeft, psEarthquakeEyes },
                 {}, Config::FRAMETIME, -2
             }
         },
         "Vacuuming",
+        &Transitions::crossfade
+    };
+
+    Sequence powerstickVacuumEnd1000 {
+        {
+            {   
+                {
+                    mirrorLeft, psEarthquakeEyes, //psGlitchEyes,
+                    //new Tween<u8>(&(psGlitchEyes->intensity), 50, 0, 360 MILLIS, TWEEN_LINEAR), 
+                    //new Tween<u8>(&(psGlitchEyes->maxShift), 2, 1, 360 MILLIS, TWEEN_LINEAR), 
+                    new Tween<u8>(&(psEarthquakeEyes->amplitudeY), 0, 0, 0 MILLIS, TWEEN_LINEAR),
+                    new Tween<u8>(&(psEarthquakeEyes->amplitudeX), 1, 0.4f, 360 MILLIS, TWEEN_LINEAR)
+                },
+                {{EYES, Eye::boop}}, 360 MILLIS
+            },
+            {   
+                {
+                    mirrorLeft
+                },
+                {{EYES, Eye::powerstick}}
+            },
+        },
+        "End 1000",
         nullptr
     };
 
-    // TODO: end vacuuming sequence
-    Sequence powerstickEndVacuuming {
+    Sequence powerstickVacuumEnd1500 {
         {
             {   
-                {mirrorLeft},{{EYES, Eye::powerstick}}
+                {
+                    mirrorLeft, psEarthquakeEyes, //psGlitchEyes,
+                    //new Tween<u8>(&(psGlitchEyes->intensity), 60, 0, 640 MILLIS, TWEEN_LINEAR), 
+                    //new Tween<u8>(&(psGlitchEyes->maxShift), 3, 1, 640 MILLIS, TWEEN_LINEAR), 
+                    new Tween<u8>(&(psEarthquakeEyes->amplitudeY), 0, 0, 0 MILLIS, TWEEN_LINEAR),
+                    new Tween<u8>(&(psEarthquakeEyes->amplitudeX), 1, 0.4f, 640 MILLIS, TWEEN_LINEAR)
+                },
+                {{EYES, Eye::boop}}, 640 MILLIS
+            },
+            {   
+                {
+                    mirrorLeft
+                },
+                {{EYES, Eye::powerstick}}
             },
         },
-        "End vacuuming",
+        "End 1500",
+        nullptr
+    };
+
+    Sequence powerstickVacuumEnd2000 {
+        {
+            {   
+                {
+                    mirrorLeft, psEarthquakeEyes, //psGlitchEyes,
+                    //new Tween<u8>(&(psGlitchEyes->intensity), 75, 0, 1550 MILLIS, TWEEN_LINEAR), 
+                    //new Tween<u8>(&(psGlitchEyes->maxShift), 3, 1, 1550 MILLIS, TWEEN_LINEAR), 
+                    new Tween<u8>(&(psEarthquakeEyes->amplitudeY), 1, 0.25f, 1550 MILLIS, TWEEN_LINEAR),
+                    new Tween<u8>(&(psEarthquakeEyes->amplitudeX), 2, 0.4f, 1550 MILLIS, TWEEN_LINEAR)
+                },
+                {{EYES, Eye::boop}}, 1550 MILLIS
+            },
+            {   
+                {
+                    mirrorLeft
+                },
+                {{EYES, Eye::powerstick}}
+            },
+        },
+        "End 2000",
+        nullptr
+    };
+
+    Sequence powerstickVacuumEnd4000 {
+        {
+            {   
+                {
+                    mirrorLeft, psEarthquakeEyes, //psGlitchEyes,
+                    //new Tween<u8>(&(psGlitchEyes->intensity), 90, 0, 2400 MILLIS, TWEEN_LINEAR), 
+                    //new Tween<u8>(&(psGlitchEyes->maxShift), 3, 1, 2400 MILLIS, TWEEN_LINEAR), 
+                    new Tween<u8>(&(psEarthquakeEyes->amplitudeY), 1, 0.25f, 2400 MILLIS, TWEEN_LINEAR),
+                    new Tween<u8>(&(psEarthquakeEyes->amplitudeX), 2, 0.4f, 2400 MILLIS, TWEEN_LINEAR)
+                },
+                {{EYES, Eye::boop}}, 2400 MILLIS
+            },
+            {   
+                {
+                    mirrorLeft
+                },
+                {{EYES, Eye::powerstick}}
+            },
+        },
+        "End 4000",
         nullptr
     };
 
     // TODO: bug in the tweening system causes tweened variables to inhibit previous values for one frame, tween in keyframe 0 is a workaround
-    Sequence powerstickError {
+    Sequence powerstickVacuumFail {
         {
             {{new Tween<u8>(&(psExpandEyes->iterations), 0, 0, 0 MILLIS, TWEEN_IN)},{{EYES, Eye::exclamationPoint}}, 114 MILLIS},
             {{},{{EYES, Other::empty}}, 35 MILLIS},

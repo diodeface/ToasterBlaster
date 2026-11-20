@@ -32,7 +32,7 @@ class VacuumCleanerButton : public Sensor {
 
 		lastStartTime = millis();
 		mp3player->play(2);		// 0002_vacuumStart
-        sequencePlayer->transitionSequence(&Sequences::powerstickStartVacuuming);
+        sequencePlayer->transitionSequence(&Sequences::powerstickVacuumStart);
     }
 	
     void onDisable() override {
@@ -44,23 +44,23 @@ class VacuumCleanerButton : public Sensor {
 		long heldTime = millis() - lastStartTime;
 
 		if (heldTime > 4000) {
-			sequencePlayer->transitionSequence(&Sequences::powerstickEndVacuuming);
+			sequencePlayer->transitionSequence(&Sequences::powerstickVacuumEnd4000);
 			mp3player->play(6);		// 0006_vacuumEnd4000
 		} 
 		else if (heldTime > 2000) {
-			sequencePlayer->transitionSequence(&Sequences::powerstickEndVacuuming);
+			sequencePlayer->transitionSequence(&Sequences::powerstickVacuumEnd2000);
 			mp3player->play(5);		// 0005_vacuumEnd2000
 		} 
 		else if (heldTime > 1500) {
-			sequencePlayer->transitionSequence(&Sequences::powerstickDefault);
+			sequencePlayer->transitionSequence(&Sequences::powerstickVacuumEnd1500);
 			mp3player->play(4);		// 0004_vacuumEnd1500
 		} 
 		else if (heldTime > 1000) {
-			sequencePlayer->transitionSequence(&Sequences::powerstickDefault);
+			sequencePlayer->transitionSequence(&Sequences::powerstickVacuumEnd1000);
 			mp3player->play(3);		// 0003_vacuumEnd1000
 		} 
 		else {
-			sequencePlayer->transitionSequence(&Sequences::powerstickError);
+			sequencePlayer->transitionSequence(&Sequences::powerstickVacuumFail);
 			mp3player->play(1);		// 0001_fail
 		}  
     }
@@ -80,6 +80,7 @@ class VacuumCleanerButton : public Sensor {
 		if (mp3player->begin(*serial)) {
 			TOASTER_LOG("Vacuum cleaner button initialized successfully");
 			mp3player->volume(20);
+			mp3player->play(7);		// 0007_startup
 			initSuccess = true;
 		} else {
 			TOASTER_LOG("Vacuum cleaner button init failed");

@@ -6,6 +6,7 @@
 <p align="middle"> 
 This is an LED control program for protogen helmets to be used with MAX7219 LED matrixes and ESP32 dev boards.<br>
 <b>Custom build for powerstick synth</b><br>
+<img src="docs/images/powerstick.jpg" height="300" />
 </p>
 
 # Setup

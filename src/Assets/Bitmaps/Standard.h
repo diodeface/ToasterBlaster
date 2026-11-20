@@ -31,6 +31,8 @@ namespace Bitmaps {
             neutral[16],
             o[16],
             powerstick[16],
+            powerstickStartup0[16],
+            powerstickStartup1[16],
             questionMark[16],
             u[16];
     }

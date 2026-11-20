@@ -73,9 +73,9 @@ void setup() {
     );
 
     // initialize sequencePlayer with startup sequence
-    sequencePlayer = new SequencePlayer(displayManager, displayTweenManager, eyeBlink, &Sequences::powerstickDefault, 0, true);
+    sequencePlayer = new SequencePlayer(displayManager, displayTweenManager, eyeBlink, &Sequences::powerstickStartup, 0, true);
 
-    vacuumCleanerButton = new VacuumCleanerButton(6, sequencePlayer);
+    vacuumCleanerButton = new VacuumCleanerButton(6, displayManager, sequencePlayer);
 
     // initialize default controller
     controller = new Controller_Startup(displayManager, 3 SECONDS, [](){changeController(new Controller_Settings(displayManager, settingsManager));});

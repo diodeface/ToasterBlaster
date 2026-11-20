@@ -7,7 +7,9 @@
 
 namespace Sequences {
     extern Sequence 
+        powerstickStartup,
         powerstickDefault,
+        powerstickActivate,
         powerstickVacuumFail,
         powerstickVacuumStart,
         powerstickVacuumEnd1000,

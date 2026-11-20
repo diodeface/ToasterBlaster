@@ -103,6 +103,7 @@ void SequencePlayer::setSequence(Sequence* sequence) {
     displayManager->hud->drawStatusText(sequence->name);
     reset();
     waitTime = 0;
+    waitPeriod = 0;
 }
 
 bool SequencePlayer::transitionSequence(Sequence* sequence) {

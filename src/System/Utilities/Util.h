@@ -9,7 +9,7 @@
 #include "Arduino.h"
 
 #ifdef DEBUG
-#define TOASTER_LOG(s, ...) ets_printf(s, ##__VA_ARGS__)
+#define TOASTER_LOG(s, ...) ets_printf("[%d] ", millis()); ets_printf(s, ##__VA_ARGS__);
 #else
 #define TOASTER_LOG
 #endif
